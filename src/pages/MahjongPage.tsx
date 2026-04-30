@@ -263,6 +263,22 @@ export const MahjongPage = () => {
     };
   });
 
+  const getScoreToneClass = (score?: number) => {
+    if (score === undefined) {
+      return "score-tone score-tone--empty";
+    }
+
+    if (score > 0) {
+      return "score-tone score-tone--positive";
+    }
+
+    if (score < 0) {
+      return "score-tone score-tone--negative";
+    }
+
+    return "score-tone";
+  };
+
   return (
     <AppShell
       title="麻雀"
@@ -389,7 +405,7 @@ export const MahjongPage = () => {
                   <StandardCard key={member.name} className={index === 0 ? "surface-card--winner" : ""}>
                     <p className="eyebrow">#{index + 1}</p>
                     <h3>{member.name}</h3>
-                    <p className="numeric-highlight">
+                    <p className={`numeric-highlight ${getScoreToneClass(member.score)}`}>
                       {member.score >= 0 ? "+" : ""}
                       {formatNumber(member.score)}
                     </p>
@@ -423,12 +439,12 @@ export const MahjongPage = () => {
                           {perGameScores.map((game) => {
                             const score = game.scores[member.name];
                             return (
-                              <td key={`${member.name}-${game.label}`}>
+                              <td className={getScoreToneClass(score)} key={`${member.name}-${game.label}`}>
                                 {score === undefined ? "-" : `${score >= 0 ? "+" : ""}${formatNumber(score)}`}
                               </td>
                             );
                           })}
-                          <td className="result-table__total">
+                          <td className={`result-table__total ${getScoreToneClass(member.score)}`}>
                             {member.score >= 0 ? "+" : ""}
                             {formatNumber(member.score)}
                           </td>

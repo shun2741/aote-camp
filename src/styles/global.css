@@ -1010,6 +1010,18 @@ a.button {
   color: var(--color-primary-dark);
 }
 
+.score-tone--positive {
+  color: var(--color-success);
+}
+
+.score-tone--negative {
+  color: var(--color-danger);
+}
+
+.score-tone--empty {
+  color: rgba(109, 123, 128, 0.6);
+}
+
 .empty-state {
   padding: 28px 20px;
   border-radius: var(--radius-md);
