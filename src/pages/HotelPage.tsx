@@ -3,6 +3,7 @@ import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { EmptyState } from "../components/EmptyState";
 import { HeroCard } from "../components/HeroCard";
+import { IllustrationCard } from "../components/IllustrationCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
 import { getTripById } from "../data/trips";
@@ -40,6 +41,13 @@ export const HotelPage = () => {
           <SectionHeader
             title="宿泊情報"
             description="予約番号のような機微情報は載せず、必要な情報だけをまとめています。"
+          />
+          <IllustrationCard
+            src="/hotel-lakeside-guide.png"
+            alt="ホテルレイクサイドつくばの設備イメージ"
+            eyebrow="宿のイメージ"
+            title="駐車場、コート、温泉、麻雀室の位置感を先に掴む"
+            description="ホテルページの先頭で全体像を把握する用途です。実写よりも案内図っぽく使う前提で置いています。"
           />
           {trip.hotels.length === 0 ? (
             <EmptyState

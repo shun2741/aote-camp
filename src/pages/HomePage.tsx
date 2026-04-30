@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { HeroCard } from "../components/HeroCard";
+import { IllustrationCard } from "../components/IllustrationCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
 import { StatusTag } from "../components/StatusTag";
@@ -47,6 +48,14 @@ export const HomePage = () => (
           { label: "参加人数", value: `${latestTrip.members.length}人` },
           { label: "メイン会場", value: latestTrip.destination },
         ]}
+      />
+
+      <IllustrationCard
+        src="/hero-gw-tennis.png"
+        alt="ゴールデンウィークのテニス合宿イメージ"
+        eyebrow="旅のイメージ"
+        title="現地に着いた瞬間の空気感を先に共有"
+        description="トップの大きな絵として使う想定です。集合前に見ても、どんな旅かすぐ伝わる位置に置いています。"
       />
 
       <section className="stack-md">

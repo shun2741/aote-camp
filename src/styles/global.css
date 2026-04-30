@@ -542,6 +542,85 @@ a.button {
   color: var(--color-primary-dark);
 }
 
+.illustration-card {
+  overflow: hidden;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(238, 217, 202, 0.95);
+  box-shadow: var(--shadow-card);
+}
+
+.illustration-card__image,
+.illustration-card__fallback {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  object-fit: cover;
+}
+
+.illustration-card__fallback {
+  position: relative;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(127, 200, 248, 0.55), transparent 20%),
+    radial-gradient(circle at 80% 20%, rgba(243, 165, 142, 0.45), transparent 18%),
+    linear-gradient(180deg, #dff4ff 0%, #fef6ef 100%);
+}
+
+.illustration-card__dot,
+.illustration-card__line {
+  position: absolute;
+  display: block;
+}
+
+.illustration-card__dot {
+  border-radius: 999px;
+}
+
+.illustration-card__dot--a {
+  left: 12%;
+  bottom: 20%;
+  width: 38%;
+  height: 22%;
+  background: rgba(138, 214, 201, 0.35);
+}
+
+.illustration-card__dot--b {
+  right: 10%;
+  top: 14%;
+  width: 28%;
+  height: 18%;
+  background: rgba(127, 200, 248, 0.45);
+}
+
+.illustration-card__line--a {
+  left: 12%;
+  top: 18%;
+  width: 30%;
+  height: 3px;
+  background: rgba(49, 95, 103, 0.3);
+  transform: rotate(-8deg);
+}
+
+.illustration-card__line--b {
+  right: 12%;
+  bottom: 18%;
+  width: 22%;
+  height: 3px;
+  background: rgba(49, 95, 103, 0.24);
+  transform: rotate(12deg);
+}
+
+.illustration-card__body {
+  display: grid;
+  gap: 8px;
+  padding: 18px 18px 20px;
+}
+
+.illustration-card__body h3,
+.illustration-card__body p {
+  margin: 0;
+}
+
 .metric-grid,
 .detail-grid,
 .action-grid,
