@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
@@ -9,6 +10,7 @@ import { getTripById } from "../data/trips";
 import { usePersistentState } from "../hooks/usePersistentState";
 import { formatNumber, formatPelica } from "../lib/format";
 import { calculateMahjongSummary } from "../lib/mahjong";
+import type { MahjongGame, MahjongPlayerResult, Trip } from "../types/trip";
 import { NotFoundPage } from "./NotFoundPage";
 
 type MahjongDraftGame = {
@@ -35,10 +37,87 @@ const createEmptyDraftGame = (gameNumber: number, players: string[] = []) => ({
   points: Object.fromEntries(players.map((player) => [player, `${defaultRule.startPoint}`])),
 });
 
+const createInitialDraftState = (trip: Trip): MahjongDraftState => ({
+  games:
+    trip.mahjong?.games.map((game) => ({
+      label: game.label,
+      players: game.results.map((result) => result.name),
+      points: Object.fromEntries(game.results.map((result) => [result.name, `${result.point}`])),
+    })) ?? [createEmptyDraftGame(1, trip.members.slice(0, 4))],
+});
+
 const normalizeDraftGame = (game: MahjongDraftGame) => ({
   ...game,
   points: Object.fromEntries(game.players.map((player) => [player, game.points[player] ?? `${defaultRule.startPoint}`])),
 });
+
+const sanitizePlayers = (players: unknown, validMembers: string[]) =>
+  Array.isArray(players)
+    ? players.filter((player): player is string => typeof player === "string" && validMembers.includes(player)).slice(0, 4)
+    : [];
+
+const sanitizeLegacyResults = (results: unknown, validMembers: string[]) =>
+  Array.isArray(results)
+    ? results.filter(
+        (result): result is MahjongPlayerResult =>
+          typeof result === "object" &&
+          result !== null &&
+          typeof (result as MahjongPlayerResult).name === "string" &&
+          typeof (result as MahjongPlayerResult).point === "number" &&
+          validMembers.includes((result as MahjongPlayerResult).name),
+      )
+    : [];
+
+const migrateMahjongDraftState = (value: unknown, trip: Trip): MahjongDraftState => {
+  const fallback = createInitialDraftState(trip);
+
+  if (!value || typeof value !== "object" || !("games" in value) || !Array.isArray((value as { games?: unknown[] }).games)) {
+    return fallback;
+  }
+
+  const rawGames = (value as { games: unknown[] }).games;
+  const migratedGames = rawGames
+    .map((rawGame, index) => {
+      if (!rawGame || typeof rawGame !== "object") {
+        return null;
+      }
+
+      const record = rawGame as {
+        label?: unknown;
+        players?: unknown;
+        points?: unknown;
+        results?: unknown;
+      };
+
+      const label = typeof record.label === "string" && record.label.trim() ? record.label : `${index + 1}半荘目`;
+      const legacyResults = sanitizeLegacyResults(record.results, trip.members);
+      const players =
+        sanitizePlayers(record.players, trip.members).length > 0
+          ? sanitizePlayers(record.players, trip.members)
+          : legacyResults.map((result) => result.name).slice(0, 4);
+
+      const points =
+        legacyResults.length > 0
+          ? Object.fromEntries(legacyResults.map((result) => [result.name, `${result.point}`]))
+          : typeof record.points === "object" && record.points !== null
+            ? Object.fromEntries(
+                players.map((player) => {
+                  const rawPoint = (record.points as Record<string, unknown>)[player];
+                  return [player, typeof rawPoint === "string" ? rawPoint : `${defaultRule.startPoint}`];
+                }),
+              )
+            : Object.fromEntries(players.map((player) => [player, `${defaultRule.startPoint}`]));
+
+      return normalizeDraftGame({
+        label,
+        players,
+        points,
+      });
+    })
+    .filter((game): game is MahjongDraftGame => game !== null);
+
+  return migratedGames.length > 0 ? { games: migratedGames } : fallback;
+};
 
 export const MahjongPage = () => {
   const { tripId = "" } = useParams();
@@ -50,40 +129,51 @@ export const MahjongPage = () => {
 
   const [draft, setDraft, resetDraft] = usePersistentState<MahjongDraftState>(
     `trip-mahjong:${trip.id}`,
-    {
-      games:
-        trip.mahjong?.games.map((game) => ({
-          label: game.label,
-          players: game.results.map((result) => result.name),
-          points: Object.fromEntries(game.results.map((result) => [result.name, `${result.point}`])),
-        })) ?? [createEmptyDraftGame(1, trip.members.slice(0, 4))],
-    },
+    createInitialDraftState(trip),
   );
+  const migratedDraft = migrateMahjongDraftState(draft as unknown, trip);
+
+  useEffect(() => {
+    if (JSON.stringify(draft) === JSON.stringify(migratedDraft)) {
+      return;
+    }
+
+    setDraft(migratedDraft);
+  }, [draft, migratedDraft, setDraft]);
 
   const addGame = () => {
     setDraft((current) => {
-      const lastPlayers = current.games[current.games.length - 1]?.players ?? [];
+      const safeCurrent = migrateMahjongDraftState(current as unknown, trip);
+      const lastPlayers = safeCurrent.games[safeCurrent.games.length - 1]?.players ?? [];
       return {
-        games: [...current.games, createEmptyDraftGame(current.games.length + 1, lastPlayers)],
+        games: [...safeCurrent.games, createEmptyDraftGame(safeCurrent.games.length + 1, lastPlayers)],
       };
     });
   };
 
   const removeGame = (index: number) => {
-    setDraft((current) => ({
-      games: current.games.filter((_, gameIndex) => gameIndex !== index),
-    }));
+    setDraft((current) => {
+      const safeCurrent = migrateMahjongDraftState(current as unknown, trip);
+      return {
+        games: safeCurrent.games.filter((_, gameIndex) => gameIndex !== index),
+      };
+    });
   };
 
   const updateGameLabel = (index: number, label: string) => {
-    setDraft((current) => ({
-      games: current.games.map((game, gameIndex) => (gameIndex === index ? { ...game, label } : game)),
-    }));
+    setDraft((current) => {
+      const safeCurrent = migrateMahjongDraftState(current as unknown, trip);
+      return {
+        games: safeCurrent.games.map((game, gameIndex) => (gameIndex === index ? { ...game, label } : game)),
+      };
+    });
   };
 
   const togglePlayer = (gameIndex: number, member: string) => {
-    setDraft((current) => ({
-      games: current.games.map((game, currentIndex) => {
+    setDraft((current) => {
+      const safeCurrent = migrateMahjongDraftState(current as unknown, trip);
+      return {
+        games: safeCurrent.games.map((game, currentIndex) => {
         if (currentIndex !== gameIndex) {
           return game;
         }
@@ -110,12 +200,15 @@ export const MahjongPage = () => {
           },
         };
       }),
-    }));
+    };
+    });
   };
 
   const updatePoint = (gameIndex: number, playerName: string, rawValue: string) => {
-    setDraft((current) => ({
-      games: current.games.map((game, currentIndex) =>
+    setDraft((current) => {
+      const safeCurrent = migrateMahjongDraftState(current as unknown, trip);
+      return {
+        games: safeCurrent.games.map((game, currentIndex) =>
         currentIndex === gameIndex
           ? {
               ...game,
@@ -126,10 +219,11 @@ export const MahjongPage = () => {
             }
           : game,
       ),
-    }));
+    };
+    });
   };
 
-  const completedGames = draft.games
+  const completedGames = migratedDraft.games
     .map((game, gameIndex) => ({ game: normalizeDraftGame(game), gameIndex }))
     .filter(({ game }) => game.players.length === 4)
     .map(({ game, gameIndex }) => ({
@@ -161,7 +255,7 @@ export const MahjongPage = () => {
     })
     .sort((left, right) => right.amount - left.amount);
 
-  const perGameAmounts = draft.games.map((game, draftIndex) => {
+  const perGameAmounts = migratedDraft.games.map((game, draftIndex) => {
     const summaryIndex = completedGames.findIndex((entry) => entry.gameIndex === draftIndex);
     const rows = summaryIndex >= 0 ? summary?.games[summaryIndex]?.rows ?? [] : [];
     return {
@@ -185,7 +279,7 @@ export const MahjongPage = () => {
           description="半荘ごとに卓メンバーを切り替えて入力できます。集計はペリカ表示で、全員分を1つの表にまとめています。"
           meta={[
             { label: "ルール", value: "1・2の点5" },
-            { label: "半荘数", value: `${draft.games.length}` },
+            { label: "半荘数", value: `${migratedDraft.games.length}` },
             { label: "有効半荘", value: `${completedGames.length}` },
           ]}
         />
@@ -205,7 +299,7 @@ export const MahjongPage = () => {
               </button>
             </div>
 
-            {draft.games.map((game, gameIndex) => {
+            {migratedDraft.games.map((game, gameIndex) => {
               const normalized = normalizeDraftGame(game);
               const totalPoint = normalized.players.reduce(
                 (sum, player) => sum + (Number(normalized.points[player]) || 0),
