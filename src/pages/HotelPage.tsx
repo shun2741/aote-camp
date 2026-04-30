@@ -19,10 +19,10 @@ export const HotelPage = () => {
 
   return (
     <AppShell
-      title="Hotel"
+      title="ホテル"
       subtitle={trip.title}
       backTo={`/trips/${trip.id}`}
-      backLabel="Trip"
+      backLabel="概要"
       bottomNav={<BottomNavigation tripId={trip.id} />}
     >
       <div className="stack-lg">
@@ -31,15 +31,15 @@ export const HotelPage = () => {
           title="宿泊情報"
           description="チェックイン、部屋割り、アクセス情報をその場で開けるように整理。"
           meta={[
-            { label: "Hotels", value: `${trip.hotels.length}` },
+            { label: "宿数", value: `${trip.hotels.length}` },
             { label: "期間", value: formatDateRange(trip.startDate, trip.endDate) },
           ]}
         />
 
         <section className="stack-md">
           <SectionHeader
-            title="Stay Details"
-            description="予約番号のような機微情報は載せず、行動に必要な情報だけを表示。"
+            title="宿泊情報"
+            description="予約番号のような機微情報は載せず、必要な情報だけをまとめています。"
           />
           {trip.hotels.length === 0 ? (
             <EmptyState
@@ -57,11 +57,11 @@ export const HotelPage = () => {
                     </div>
                     <div className="compact-metrics">
                       <div>
-                        <span>Check In</span>
+                        <span>チェックイン</span>
                         <strong>{hotel.checkIn ?? "-"}</strong>
                       </div>
                       <div>
-                        <span>Check Out</span>
+                        <span>チェックアウト</span>
                         <strong>{hotel.checkOut ?? "-"}</strong>
                       </div>
                     </div>
@@ -100,7 +100,7 @@ export const HotelPage = () => {
 
                   {hotel.rooms?.length ? (
                     <div className="stack-sm">
-                      <SectionHeader title="Room Split" />
+                      <SectionHeader title="部屋割り" />
                       <div className="detail-grid">
                         {hotel.rooms.map((room) => (
                           <div className="room-card" key={room.name}>
@@ -115,7 +115,7 @@ export const HotelPage = () => {
                   <div className="inline-cluster">
                     {hotel.mapUrl ? (
                       <a className="button button--secondary" href={hotel.mapUrl} target="_blank" rel="noreferrer">
-                        Map
+                        地図を見る
                       </a>
                     ) : null}
                     {hotel.officialUrl ? (

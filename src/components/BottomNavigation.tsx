@@ -5,11 +5,11 @@ type BottomNavigationProps = {
 };
 
 const items = [
-  { label: "概要", icon: "OV", to: "" },
-  { label: "予定", icon: "SC", to: "/schedule" },
-  { label: "宿", icon: "HT", to: "/hotel" },
-  { label: "経費", icon: "EX", to: "/expenses" },
-  { label: "麻雀", icon: "MJ", to: "/mahjong" },
+  { label: "概要", icon: "旅", to: "" },
+  { label: "予定", icon: "予", to: "/schedule" },
+  { label: "宿", icon: "宿", to: "/hotel" },
+  { label: "経費", icon: "¥", to: "/expenses" },
+  { label: "麻雀", icon: "雀", to: "/mahjong" },
 ];
 
 export const BottomNavigation = ({ tripId }: BottomNavigationProps) => (

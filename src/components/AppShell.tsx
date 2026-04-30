@@ -14,7 +14,7 @@ export const AppShell = ({
   title,
   subtitle,
   backTo,
-  backLabel = "Back",
+  backLabel = "戻る",
   bottomNav,
   children,
 }: AppShellProps) => (
@@ -28,7 +28,7 @@ export const AppShell = ({
             </Link>
           ) : (
             <Link className="brand-mark" to="/">
-              AOTE
+              旅
             </Link>
           )}
           <div>
@@ -37,7 +37,7 @@ export const AppShell = ({
           </div>
         </div>
         <Link className="brand-chip" to="/">
-          Trip Index
+          旅行一覧
         </Link>
       </div>
     </header>

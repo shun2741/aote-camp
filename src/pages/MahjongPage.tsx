@@ -22,10 +22,10 @@ export const MahjongPage = () => {
 
   return (
     <AppShell
-      title="Mahjong"
+      title="麻雀"
       subtitle={trip.title}
       backTo={`/trips/${trip.id}`}
-      backLabel="Trip"
+      backLabel="概要"
       bottomNav={<BottomNavigation tripId={trip.id} />}
     >
       <div className="stack-lg">
@@ -34,9 +34,9 @@ export const MahjongPage = () => {
           title="麻雀精算"
           description="素点、ウマ、オカをまとめて計算し、最終収支と支払い一覧に落とし込みます。"
           meta={[
-            { label: "Rule", value: "1・2の点5" },
-            { label: "Games", value: `${trip.mahjong?.games.length ?? 0}` },
-            { label: "Players", value: `${trip.mahjong?.games[0]?.results.length ?? 0}` },
+            { label: "ルール", value: "1・2の点5" },
+            { label: "半荘数", value: `${trip.mahjong?.games.length ?? 0}` },
+            { label: "人数", value: `${trip.mahjong?.games[0]?.results.length ?? 0}` },
           ]}
         />
 
@@ -49,8 +49,8 @@ export const MahjongPage = () => {
           <>
             <section className="stack-md">
               <SectionHeader
-                title="Final Result"
-                description="半荘ごとのスコアを合算した最終順位。"
+                title="最終結果"
+                description="半荘ごとのスコアを合算した最終順位です。"
               />
               <div className="detail-grid">
                 {summary.standings.map((standing, index) => (
@@ -66,8 +66,8 @@ export const MahjongPage = () => {
 
             <section className="stack-md">
               <SectionHeader
-                title="Payments"
-                description="最終収支を相殺した支払い指示。"
+                title="支払い一覧"
+                description="最終収支を相殺した支払い指示です。"
               />
               <StandardCard className="stack-sm">
                 {summary.payments.map((payment) => (
@@ -84,15 +84,15 @@ export const MahjongPage = () => {
 
             <section className="stack-md">
               <SectionHeader
-                title="By Game"
-                description="各半荘の順位、スコア、円換算結果を確認。"
+                title="半荘ごとの結果"
+                description="各半荘の順位、スコア、円換算結果を確認できます。"
               />
               <div className="stack-md">
                 {summary.games.map((game) => (
                   <StandardCard key={game.label}>
                     <div className="card-header">
                       <div>
-                        <p className="eyebrow">Game</p>
+                        <p className="eyebrow">半荘</p>
                         <h3>{game.label}</h3>
                       </div>
                     </div>

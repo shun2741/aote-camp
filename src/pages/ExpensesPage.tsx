@@ -24,10 +24,10 @@ export const ExpensesPage = () => {
 
   return (
     <AppShell
-      title="Expenses"
+      title="経費"
       subtitle={trip.title}
       backTo={`/trips/${trip.id}`}
-      backLabel="Trip"
+      backLabel="概要"
       bottomNav={<BottomNavigation tripId={trip.id} />}
     >
       <div className="stack-lg">
@@ -36,9 +36,9 @@ export const ExpensesPage = () => {
           title="経費と割り勘"
           description="立替一覧を見ながら、本来負担額との差分から最終支払いを自動算出。"
           meta={[
-            { label: "Total", value: formatCurrency(summary.totalAmount) },
-            { label: "Items", value: `${trip.expenses.length}` },
-            { label: "Settlements", value: `${summary.payments.length}` },
+            { label: "総額", value: formatCurrency(summary.totalAmount) },
+            { label: "件数", value: `${trip.expenses.length}` },
+            { label: "精算数", value: `${summary.payments.length}` },
           ]}
         />
 
@@ -51,8 +51,8 @@ export const ExpensesPage = () => {
           <>
             <section className="stack-md">
               <SectionHeader
-                title="Summary"
-                description="支払済額、本来負担額、差額をメンバー単位で比較。"
+                title="メンバー別まとめ"
+                description="支払済額、本来負担額、差額をメンバーごとに見比べられます。"
               />
               <div className="detail-grid">
                 {summary.balances.map((balance) => (
@@ -78,8 +78,8 @@ export const ExpensesPage = () => {
 
             <section className="stack-md">
               <SectionHeader
-                title="Settlement"
-                description="誰が誰にいくら払えば終わるかを最短本数で表示。"
+                title="精算結果"
+                description="誰が誰にいくら払えば終わるかをわかりやすく表示します。"
               />
               <StandardCard className="stack-sm">
                 {summary.payments.map((payment) => (
@@ -96,8 +96,8 @@ export const ExpensesPage = () => {
 
             <section className="stack-md">
               <SectionHeader
-                title="Expense List"
-                description="カテゴリ、立替者、対象者、1人あたり金額までカードで確認。"
+                title="経費一覧"
+                description="カテゴリ、立替者、対象者、1人あたり金額までカードで確認できます。"
               />
               <div className="stack-md">
                 {trip.expenses.map((expense) => {

@@ -19,10 +19,10 @@ export const SchedulePage = () => {
 
   return (
     <AppShell
-      title="Schedule"
+      title="スケジュール"
       subtitle={trip.title}
       backTo={`/trips/${trip.id}`}
-      backLabel="Trip"
+      backLabel="概要"
       bottomNav={<BottomNavigation tripId={trip.id} />}
     >
       <div className="stack-lg">
@@ -31,15 +31,15 @@ export const SchedulePage = () => {
           title="日別スケジュール"
           description="集合、移動、食事、麻雀まで、スマホで追いやすいタイムライン表示。"
           meta={[
-            { label: "Days", value: `${trip.schedule.length}` },
+            { label: "日数", value: `${trip.schedule.length}` },
             { label: "期間", value: formatDateRange(trip.startDate, trip.endDate) },
           ]}
         />
 
         <section className="stack-md">
           <SectionHeader
-            title="Timeline"
-            description="時刻未定のイベントも同じ列に並べられる構成。"
+            title="予定一覧"
+            description="時刻未定の予定も同じ流れで見られるタイムラインです。"
           />
           {trip.schedule.length === 0 ? (
             <EmptyState

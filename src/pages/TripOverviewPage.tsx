@@ -49,7 +49,7 @@ export const TripOverviewPage = () => {
       title={trip.title}
       subtitle={trip.destination}
       backTo="/"
-      backLabel="Home"
+      backLabel="一覧"
       bottomNav={<BottomNavigation tripId={trip.id} />}
     >
       <div className="stack-lg">
@@ -66,19 +66,19 @@ export const TripOverviewPage = () => {
 
         <section className="stack-md">
           <SectionHeader
-            title="Trip Snapshot"
-            description="旅の全体像と、各機能ページへの導線をここに集約。"
+            title="旅のまとめ"
+            description="今回の旅行の全体像と、必要なページへの入口をまとめています。"
           />
           <div className="detail-grid">
             <StandardCard>
               <div className="inline-cluster">
                 <StatusTag type="status" value={trip.status} />
               </div>
-              <h3>Overview</h3>
+              <h3>概要メモ</h3>
               <p>{trip.summary}</p>
             </StandardCard>
             <StandardCard>
-              <h3>Members</h3>
+              <h3>参加メンバー</h3>
               <p>{joinNames(trip.members)}</p>
             </StandardCard>
           </div>
@@ -86,8 +86,8 @@ export const TripOverviewPage = () => {
 
         <section className="stack-md">
           <SectionHeader
-            title="Quick Access"
-            description="旅行中に押しやすい大きめカードで各ページへ移動。"
+            title="ページを開く"
+            description="旅行中でも押しやすい大きめカードで移動できます。"
           />
           <div className="action-grid">
             {menuItems.map((item) => (

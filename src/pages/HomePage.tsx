@@ -8,16 +8,16 @@ import { latestTrip, trips } from "../data/trips";
 import { formatDateRange } from "../lib/format";
 
 export const HomePage = () => (
-  <AppShell title="AOTE Camp" subtitle="Friends travel board">
+  <AppShell title="AOTE Camp" subtitle="みんなで見る旅行ノート">
     <div className="stack-lg">
       <HeroCard
-        eyebrow="Ride the Trip."
-        title="仲間との旅を、クールにまとめる。"
-        description="毎年の旅行を1つのURLに集約。予定、宿、経費、麻雀精算までスマホで素早く確認できます。"
+        eyebrow="みんなの旅しおり"
+        title="次の予定も、あとからの精算も、ここでひとまとめ。"
+        description="集合時間、宿、立替、麻雀の結果まで、友達同士で見返しやすい形に整理した旅行ページです。"
         meta={[
-          { label: "Trips", value: `${trips.length}` },
-          { label: "Latest", value: latestTrip.title },
-          { label: "Focus", value: "Mobile First" },
+          { label: "旅行数", value: `${trips.length}` },
+          { label: "最新", value: latestTrip.title },
+          { label: "見やすさ", value: "スマホ優先" },
         ]}
         actions={
           <Link className="button button--primary" to={`/trips/${latestTrip.id}`}>
@@ -28,8 +28,8 @@ export const HomePage = () => (
 
       <section className="stack-md">
         <SectionHeader
-          title="Latest Drop"
-          description="今年の旅行ページに最短で入るためのショートカット。"
+          title="まず見るページ"
+          description="今年の旅行にすぐ入れるショートカットです。"
         />
         <StandardCard className="trip-highlight">
           <div className="trip-highlight__body">
@@ -60,8 +60,8 @@ export const HomePage = () => (
 
       <section className="stack-md">
         <SectionHeader
-          title="Trip Archive"
-          description="過去分も同じUIで蓄積。来年以降はデータ追加だけで増やせます。"
+          title="これまでの旅行"
+          description="過去分も同じ見た目で並べて、あとから見返しやすくしています。"
         />
         <div className="trip-grid">
           {trips.map((trip) => (
