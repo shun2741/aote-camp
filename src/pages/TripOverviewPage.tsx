@@ -5,6 +5,7 @@ import { HeroCard } from "../components/HeroCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
 import { StatusTag } from "../components/StatusTag";
+import { TripBoardCard } from "../components/TripBoardCard";
 import { getTripById } from "../data/trips";
 import { formatDateRange, joinNames } from "../lib/format";
 import { NotFoundPage } from "./NotFoundPage";
@@ -44,6 +45,18 @@ export const TripOverviewPage = () => {
     return <NotFoundPage />;
   }
 
+  const keyMoments = trip.schedule
+    .flatMap((day) =>
+      day.events.map((event) => ({
+        time: event.time,
+        label: event.title,
+        detail: event.location ?? day.label,
+        important: event.important,
+      })),
+    )
+    .filter((event) => event.important || event.time)
+    .slice(0, 4);
+
   return (
     <AppShell
       title={trip.title}
@@ -58,6 +71,18 @@ export const TripOverviewPage = () => {
           title={trip.title}
           description={trip.summary}
           meta={[
+            { label: "日程", value: formatDateRange(trip.startDate, trip.endDate) },
+            { label: "参加者", value: `${trip.members.length}人` },
+            { label: "状態", value: trip.status === "planning" ? "計画中" : "実施済み" },
+          ]}
+        />
+
+        <TripBoardCard
+          title="今回の流れ"
+          subtitle={trip.destination}
+          note="最初に見るべき予定だけ先に抜き出しています。現地で迷ったらここを見れば十分な構成です。"
+          moments={keyMoments}
+          stats={[
             { label: "日程", value: formatDateRange(trip.startDate, trip.endDate) },
             { label: "参加者", value: `${trip.members.length}人` },
             { label: "状態", value: trip.status === "planning" ? "計画中" : "実施済み" },

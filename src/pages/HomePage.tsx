@@ -4,8 +4,19 @@ import { HeroCard } from "../components/HeroCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
 import { StatusTag } from "../components/StatusTag";
+import { TripBoardCard } from "../components/TripBoardCard";
 import { latestTrip, trips } from "../data/trips";
 import { formatDateRange } from "../lib/format";
+
+const latestMoments = latestTrip.schedule
+  .flatMap((day) => day.events.map((event) => ({ ...event, day: day.label })))
+  .filter((event) => event.important || event.time)
+  .slice(0, 4)
+  .map((event) => ({
+    time: event.time,
+    label: event.title,
+    detail: event.location ?? event.day,
+  }));
 
 export const HomePage = () => (
   <AppShell title="AOTE Camp" subtitle="みんなで見る旅行ノート">
@@ -24,6 +35,18 @@ export const HomePage = () => (
             最新の旅へ
           </Link>
         }
+      />
+
+      <TripBoardCard
+        title={latestTrip.title}
+        subtitle="今回のざっくり流れ"
+        note="集合からテニス、夜の麻雀まで、1画面で把握できる旅のしおり。"
+        moments={latestMoments}
+        stats={[
+          { label: "日程", value: formatDateRange(latestTrip.startDate, latestTrip.endDate) },
+          { label: "参加人数", value: `${latestTrip.members.length}人` },
+          { label: "メイン会場", value: latestTrip.destination },
+        ]}
       />
 
       <section className="stack-md">

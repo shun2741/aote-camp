@@ -389,6 +389,159 @@ a.button {
   gap: 20px;
 }
 
+.trip-board-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 247, 241, 0.95));
+  border: 1px solid rgba(238, 217, 202, 0.95);
+  box-shadow: var(--shadow-card);
+}
+
+.trip-board-card__poster,
+.trip-board-card__content {
+  display: grid;
+  gap: 14px;
+}
+
+.trip-board-card__poster {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(127, 200, 248, 0.18), rgba(243, 165, 142, 0.16)),
+    rgba(255, 255, 255, 0.7);
+}
+
+.trip-board-card__poster h2 {
+  margin: 0;
+  color: var(--color-primary-dark);
+  font-size: 1.7rem;
+}
+
+.trip-board-card__poster p {
+  margin: 0;
+}
+
+.trip-board-card__badge {
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: white;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.trip-board-card__graphic {
+  position: absolute;
+  inset: 16px 16px auto auto;
+  width: 130px;
+  height: 110px;
+}
+
+.trip-board-card__ball,
+.trip-board-card__racket {
+  position: absolute;
+  display: block;
+}
+
+.trip-board-card__ball {
+  border-radius: 999px;
+}
+
+.trip-board-card__ball--mint {
+  right: 2px;
+  top: 8px;
+  width: 64px;
+  height: 64px;
+  background: rgba(138, 214, 201, 0.68);
+}
+
+.trip-board-card__ball--blue {
+  left: 18px;
+  bottom: 0;
+  width: 44px;
+  height: 44px;
+  background: rgba(127, 200, 248, 0.78);
+}
+
+.trip-board-card__racket {
+  left: 30px;
+  top: 6px;
+  width: 62px;
+  height: 62px;
+  border: 6px solid rgba(49, 95, 103, 0.86);
+  border-radius: 999px;
+}
+
+.trip-board-card__racket::after {
+  content: "";
+  position: absolute;
+  right: -22px;
+  bottom: -26px;
+  width: 8px;
+  height: 48px;
+  border-radius: 999px;
+  transform: rotate(34deg);
+  background: rgba(49, 95, 103, 0.86);
+}
+
+.trip-board-card__moments {
+  display: grid;
+  gap: 10px;
+}
+
+.trip-board-card__moment {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(238, 217, 202, 0.86);
+}
+
+.trip-board-card__moment strong {
+  color: var(--color-primary-dark);
+}
+
+.trip-board-card__moment p {
+  margin: 4px 0 0;
+}
+
+.trip-board-card__moment-time {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.trip-board-card__stats {
+  display: grid;
+  gap: 10px;
+}
+
+.trip-board-card__stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 244, 234, 0.7);
+}
+
+.trip-board-card__stat span {
+  color: var(--color-text-sub);
+  font-size: 0.82rem;
+}
+
+.trip-board-card__stat strong {
+  color: var(--color-primary-dark);
+}
+
 .metric-grid,
 .detail-grid,
 .action-grid,
@@ -654,6 +807,72 @@ a.button {
   font-weight: 800;
 }
 
+.form-grid,
+.point-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span,
+.field-label {
+  color: var(--color-text-sub);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(238, 217, 202, 0.95);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-text);
+  outline: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: rgba(127, 200, 248, 0.9);
+  box-shadow: 0 0 0 4px rgba(127, 200, 248, 0.16);
+}
+
+.field--inline {
+  min-width: min(100%, 240px);
+}
+
+.chip-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.select-chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(238, 217, 202, 0.95);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+.select-chip--selected {
+  background: rgba(127, 200, 248, 0.18);
+  border-color: rgba(127, 200, 248, 0.85);
+}
+
+.select-chip:disabled {
+  opacity: 0.45;
+}
+
 .card-header {
   display: flex;
   align-items: start;
@@ -744,6 +963,19 @@ a.button {
   gap: 4px;
 }
 
+.point-total {
+  text-align: right;
+  font-size: 0.92rem;
+}
+
+.point-total--ok {
+  color: var(--color-success);
+}
+
+.point-total--warn {
+  color: var(--color-danger);
+}
+
 .empty-state {
   padding: 28px 20px;
   border-radius: var(--radius-md);
@@ -828,6 +1060,20 @@ a.button {
   }
 
   .action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trip-board-card {
+    grid-template-columns: minmax(280px, 0.95fr) 1.05fr;
+    align-items: stretch;
+  }
+
+  .trip-board-card__stats,
+  .point-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
