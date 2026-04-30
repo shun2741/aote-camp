@@ -122,7 +122,7 @@ export const HotelPage = () => {
                     ) : null}
                   </dl>
 
-                    {hotel.rooms?.length ? (
+                  {hotel.rooms?.length ? (
                     <div className="stack-sm">
                       <SectionHeader title="部屋割り" />
                       <div className="detail-grid">
@@ -149,35 +149,31 @@ export const HotelPage = () => {
                     </div>
                   ) : null}
 
-                  {hotel.nearbyFood?.length ? (
+                  {hotel.highlights?.length ? (
                     <div className="stack-sm">
                       <SectionHeader
-                        title="ごはん候補"
-                        description="5月5日（火）に寄れそうな候補を優先して掲載。"
+                        title="あると助かる情報"
+                        description="現地で迷いそうな設備情報だけを抜き出しています。"
                       />
                       <div className="stack-sm">
-                        {hotel.nearbyFood.map((spot) => (
-                          <div className="food-spot-card" key={spot.name}>
+                        {hotel.highlights.map((spot) => (
+                          <div className="facility-card" key={spot.name}>
                             <div className="stack-xs">
                               <div className="inline-cluster">
-                                <p className="eyebrow">Food</p>
+                                <p className="eyebrow">Hotel</p>
                               </div>
                               <h3>{spot.name}</h3>
                               {spot.description ? <p>{spot.description}</p> : null}
                             </div>
                             <dl className="detail-list">
-                              {spot.address ? (
-                                <div>
-                                  <dt>住所</dt>
-                                  <dd>{spot.address}</dd>
-                                </div>
-                              ) : null}
-                              {spot.hours ? (
-                                <div>
-                                  <dt>営業時間</dt>
-                                  <dd>{spot.hours}</dd>
-                                </div>
-                              ) : null}
+                              {spot.details?.length
+                                ? spot.details.map((detail) => (
+                                    <div key={detail}>
+                                      <dt>情報</dt>
+                                      <dd>{detail}</dd>
+                                    </div>
+                                  ))
+                                : null}
                               {spot.note ? (
                                 <div>
                                   <dt>メモ</dt>
@@ -187,7 +183,7 @@ export const HotelPage = () => {
                             </dl>
                             {spot.url ? (
                               <a className="button button--ghost" href={spot.url} target="_blank" rel="noreferrer">
-                                お店を見る
+                                詳細を見る
                               </a>
                             ) : null}
                           </div>

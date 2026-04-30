@@ -26,12 +26,11 @@ export type LinkItem = {
   url: string;
 };
 
-export type FoodSpot = {
+export type HotelHighlight = {
   name: string;
   description?: string;
-  address?: string;
-  hours?: string;
   note?: string;
+  details?: string[];
   url?: string;
 };
 
@@ -51,7 +50,7 @@ export type Hotel = {
   rooms?: Room[];
   accessNotes?: string[];
   links?: LinkItem[];
-  nearbyFood?: FoodSpot[];
+  highlights?: HotelHighlight[];
   parkingMemo?: string;
   memo?: string;
 };

@@ -112,11 +112,13 @@ export const tsukubaGw2026Trip: Trip = {
           members: ["福田", "信田", "剛", "高橋", "周平", "舟田", "翔悟"],
         },
       ],
+      parkingMemo:
+        "駐車場は合計240台で無料。ホテル正面駐車場と、道路向かいの砂利駐車場あり。宿泊者専用駐車場は到着後ホテルへ連絡。",
       accessNotes: [
         "車なら常磐道 谷田部IC、または圏央道 つくば牛久IC からのアクセスが便利。",
         "電車組はJR常磐線 龍ケ崎市駅、または TX みらい平駅 から車移動。",
         "宿泊者は龍ケ崎市駅・みらい平駅から無料送迎あり。事前予約制で、最終は17:30。",
-        "ホテルにはテニスコート、ゴルフ練習場、麻雀室がある。",
+        "建物内はフロントとレストランが1F、温泉が2FとB1、麻雀室はB1。",
       ],
       links: [
         {
@@ -124,36 +126,62 @@ export const tsukubaGw2026Trip: Trip = {
           url: "https://www.lakeside-tsukuba.jp/guide/",
         },
         {
-          label: "レストラン月のほとり",
-          url: "https://www.lakeside-tsukuba.jp/restaurant/",
+          label: "スポーツ施設案内",
+          url: "https://www.lakeside-tsukuba.jp/sports/",
+        },
+        {
+          label: "天然温泉案内",
+          url: "https://www.lakeside-tsukuba.jp/touch/bath/",
         },
       ],
-      nearbyFood: [
+      highlights: [
         {
-          name: "レストラン 月のほとり",
-          description: "ホテル館内。夕食を館内でまとめたいとき向け。",
-          hours: "17:30〜20:00（L.O.19:30）",
-          note: "現在はディナー営業のみ。ランチは休業中。",
-          url: "https://www.lakeside-tsukuba.jp/restaurant/",
+          name: "テニスコート",
+          description: "屋外オムニコート6面。宿泊者は電話予約で確保。",
+          details: [
+            "営業時間は9:00〜17:00",
+            "宿泊者料金は土日祝 1面1時間 880円",
+            "宿泊利用は6か月前の月初から予約可",
+          ],
+          note: "ナイター設備はなし。今回の予定時間と営業時間は一致。",
+          url: "https://www.lakeside-tsukuba.jp/sports/tennis.php",
         },
         {
-          name: "からあげ処 月曜から",
-          description: "龍ケ崎方面で寄りやすいランチ候補。唐揚げ中心で人数が多くても入りやすい。",
-          address: "茨城県龍ケ崎市馴馬町2840番地",
-          hours: "ランチ 月〜金 11:30〜14:30（L.O.） / 祝日時営業",
-          note: "5月5日（火・祝）でもランチ営業表記あり。",
-          url: "https://karaagedokoro.com/",
+          name: "ゴルフ練習場",
+          description: "屋外26打席。空き時間に入れやすいサブプラン。",
+          details: [
+            "営業時間は9:00〜20:00",
+            "宿泊者は1名につき50球サービスコイン1枚あり",
+            "無料貸クラブあり",
+          ],
+          note: "レストラン隣の練習場なので、夕食前後にも動きやすい。",
+          url: "https://www.lakeside-tsukuba.jp/sports/golf.php",
         },
         {
-          name: "レストラン kikyo（湯舞音 龍ケ崎店）",
-          description: "定食、丼、麺類が多く、解散前に好みが割れても選びやすい。",
-          hours: "平日 11:00〜22:00 / 土日祝 11:00〜23:00",
-          note: "15:00〜17:00はアイドルタイム。レストラン利用のみでも入店可。",
-          url: "https://yubune-ryugasaki.jp/meal/detail_1.html",
+          name: "麻雀室",
+          description: "夜のメイン。地下1階に全自動麻雀卓を5卓設置。",
+          details: [
+            "利用時間は13:00〜翌12:00",
+            "料金は1卓 6,600円",
+            "宿泊者限定。利用申込はフロントへ",
+          ],
+          note: "到着後の早い段階でフロントに空き状況を確認した方が安全。",
+          url: "https://www.lakeside-tsukuba.jp/sports/",
+        },
+        {
+          name: "天然温泉",
+          description: "テニス後に使いやすい館内温泉。",
+          details: [
+            "2F大浴場 11:00〜21:00（最終受付20:00）",
+            "B1露天風呂 12:00〜21:00（最終受付20:00）",
+            "シャンプー、リンス、ボディーソープ完備",
+          ],
+          note: "B1に露天風呂、2Fに展望大浴場。どちらも夜に使える。",
+          url: "https://www.lakeside-tsukuba.jp/touch/bath/",
         },
       ],
       memo:
-        "夜は館内の麻雀室を使う想定。昼ごはん候補は火曜定休の店も多いので、5月5日（火）は営業日を要確認で動く。",
+        "和室14畳は2F。麻雀室はB1なので、夜の移動はエレベーターでまとまって降りるとスムーズ。",
     },
   ],
   expenses: [],

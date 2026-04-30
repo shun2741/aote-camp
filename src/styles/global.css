@@ -404,7 +404,7 @@ a.button {
 .metric-card,
 .room-card,
 .note-card,
-.food-spot-card {
+.facility-card {
   display: grid;
   gap: 6px;
   padding: 14px 16px;
@@ -433,11 +433,11 @@ a.button {
   color: var(--color-text);
 }
 
-.food-spot-card h3 {
+.facility-card h3 {
   margin: 0;
 }
 
-.food-spot-card p {
+.facility-card p {
   margin: 0;
 }
 
