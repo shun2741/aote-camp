@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
@@ -6,16 +5,20 @@ import { EmptyState } from "../components/EmptyState";
 import { HeroCard } from "../components/HeroCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
-import { usePersistentState } from "../hooks/usePersistentState";
-import { formatCurrency, formatNumber } from "../lib/format";
-import { calculateMahjongSummary } from "../lib/mahjong";
-import type { MahjongGame, MahjongPlayerResult } from "../types/trip";
 import { getTripById } from "../data/trips";
+import { usePersistentState } from "../hooks/usePersistentState";
+import { formatNumber, formatPelica } from "../lib/format";
+import { calculateMahjongSummary } from "../lib/mahjong";
 import { NotFoundPage } from "./NotFoundPage";
 
-type MahjongDraftState = {
+type MahjongDraftGame = {
+  label: string;
   players: string[];
-  games: MahjongGame[];
+  points: Record<string, string>;
+};
+
+type MahjongDraftState = {
+  games: MahjongDraftGame[];
 };
 
 const defaultRule = {
@@ -26,19 +29,16 @@ const defaultRule = {
   returnPoint: 30000,
 };
 
-const createEmptyGame = (players: string[], gameNumber: number): MahjongGame => ({
+const createEmptyDraftGame = (gameNumber: number, players: string[] = []) => ({
   label: `${gameNumber}半荘目`,
-  results: players.map((name) => ({
-    name,
-    point: defaultRule.startPoint,
-  })),
+  players,
+  points: Object.fromEntries(players.map((player) => [player, `${defaultRule.startPoint}`])),
 });
 
-const normalizeResults = (players: string[], results: MahjongPlayerResult[]) =>
-  players.map((player) => ({
-    name: player,
-    point: results.find((result) => result.name === player)?.point ?? defaultRule.startPoint,
-  }));
+const normalizeDraftGame = (game: MahjongDraftGame) => ({
+  ...game,
+  points: Object.fromEntries(game.players.map((player) => [player, game.points[player] ?? `${defaultRule.startPoint}`])),
+});
 
 export const MahjongPage = () => {
   const { tripId = "" } = useParams();
@@ -51,104 +51,124 @@ export const MahjongPage = () => {
   const [draft, setDraft, resetDraft] = usePersistentState<MahjongDraftState>(
     `trip-mahjong:${trip.id}`,
     {
-      players: trip.mahjong?.games[0]?.results.map((result) => result.name) ?? trip.members.slice(0, 4),
-      games: trip.mahjong?.games ?? [],
+      games:
+        trip.mahjong?.games.map((game) => ({
+          label: game.label,
+          players: game.results.map((result) => result.name),
+          points: Object.fromEntries(game.results.map((result) => [result.name, `${result.point}`])),
+        })) ?? [createEmptyDraftGame(1, trip.members.slice(0, 4))],
     },
   );
 
-  useEffect(() => {
-    if (draft.players.length !== 4) {
-      return;
-    }
-
-    setDraft((current) => ({
-      ...current,
-      games:
-        current.games.length === 0
-          ? [createEmptyGame(current.players, 1)]
-          : current.games.map((game) => ({
-              ...game,
-              results: normalizeResults(current.players, game.results),
-            })),
-    }));
-  }, [draft.players.length, setDraft]);
-
-  const syncPlayersToGames = (players: string[]) => {
-    setDraft((current) => ({
-      players,
-      games:
-        players.length === 4
-          ? current.games.length === 0
-            ? [createEmptyGame(players, 1)]
-            : current.games.map((game) => ({
-                ...game,
-                results: normalizeResults(players, game.results),
-              }))
-          : current.games,
-    }));
-  };
-
   const addGame = () => {
-    if (draft.players.length !== 4) {
-      return;
-    }
-
-    setDraft((current) => ({
-      ...current,
-      games: [...current.games, createEmptyGame(current.players, current.games.length + 1)],
-    }));
+    setDraft((current) => {
+      const lastPlayers = current.games[current.games.length - 1]?.players ?? [];
+      return {
+        games: [...current.games, createEmptyDraftGame(current.games.length + 1, lastPlayers)],
+      };
+    });
   };
 
   const removeGame = (index: number) => {
     setDraft((current) => ({
-      ...current,
       games: current.games.filter((_, gameIndex) => gameIndex !== index),
     }));
   };
 
   const updateGameLabel = (index: number, label: string) => {
     setDraft((current) => ({
-      ...current,
       games: current.games.map((game, gameIndex) => (gameIndex === index ? { ...game, label } : game)),
     }));
   };
 
-  const updatePoint = (gameIndex: number, playerName: string, rawValue: string) => {
-    const point = Number(rawValue);
-
+  const togglePlayer = (gameIndex: number, member: string) => {
     setDraft((current) => ({
-      ...current,
-      games: current.games.map((game, currentGameIndex) => {
-        if (currentGameIndex !== gameIndex) {
+      games: current.games.map((game, currentIndex) => {
+        if (currentIndex !== gameIndex) {
+          return game;
+        }
+
+        const exists = game.players.includes(member);
+
+        if (exists) {
+          return {
+            ...game,
+            players: game.players.filter((player) => player !== member),
+          };
+        }
+
+        if (game.players.length >= 4) {
           return game;
         }
 
         return {
           ...game,
-          results: game.results.map((result) =>
-            result.name === playerName
-              ? {
-                  ...result,
-                  point: Number.isFinite(point) ? Math.max(0, Math.round(point)) : 0,
-                }
-              : result,
-          ),
+          players: [...game.players, member],
+          points: {
+            ...game.points,
+            [member]: game.points[member] ?? `${defaultRule.startPoint}`,
+          },
         };
       }),
     }));
   };
 
+  const updatePoint = (gameIndex: number, playerName: string, rawValue: string) => {
+    setDraft((current) => ({
+      games: current.games.map((game, currentIndex) =>
+        currentIndex === gameIndex
+          ? {
+              ...game,
+              points: {
+                ...game.points,
+                [playerName]: rawValue,
+              },
+            }
+          : game,
+      ),
+    }));
+  };
+
+  const completedGames = draft.games
+    .map((game, gameIndex) => ({ game: normalizeDraftGame(game), gameIndex }))
+    .filter(({ game }) => game.players.length === 4)
+    .map(({ game, gameIndex }) => ({
+      label: game.label,
+      gameIndex,
+      results: game.players.map((player) => ({
+        name: player,
+        point: Number(game.points[player]) || 0,
+      })),
+    }));
+
   const summary =
-    draft.players.length === 4 && draft.games.length > 0
+    completedGames.length > 0
       ? calculateMahjongSummary({
           title: `${trip.title} 麻雀`,
           rule: defaultRule,
-          games: draft.games.map((game) => ({
-            ...game,
-            results: normalizeResults(draft.players, game.results),
-          })),
+          games: completedGames.map(({ label, results }) => ({ label, results })),
         })
       : null;
+
+  const memberTotals = trip.members
+    .map((member) => {
+      const standing = summary?.standings.find((entry) => entry.name === member);
+      return {
+        name: member,
+        amount: standing?.amount ?? 0,
+        score: standing?.score ?? 0,
+      };
+    })
+    .sort((left, right) => right.amount - left.amount);
+
+  const perGameAmounts = draft.games.map((game, draftIndex) => {
+    const summaryIndex = completedGames.findIndex((entry) => entry.gameIndex === draftIndex);
+    const rows = summaryIndex >= 0 ? summary?.games[summaryIndex]?.rows ?? [] : [];
+    return {
+      label: game.label,
+      amounts: Object.fromEntries(rows.map((row) => [row.name, row.amount])),
+    };
+  });
 
   return (
     <AppShell
@@ -162,134 +182,124 @@ export const MahjongPage = () => {
         <HeroCard
           eyebrow={trip.destination}
           title="麻雀精算"
-          description="卓メンバーを選び、半荘ごとの点数を入れると、その場で収支と支払い一覧まで出ます。入力内容はこの端末に保存されます。"
+          description="半荘ごとに卓メンバーを切り替えて入力できます。集計はペリカ表示で、全員分を1つの表にまとめています。"
           meta={[
             { label: "ルール", value: "1・2の点5" },
             { label: "半荘数", value: `${draft.games.length}` },
-            { label: "選択人数", value: `${draft.players.length}/4人` },
+            { label: "有効半荘", value: `${completedGames.length}` },
           ]}
         />
 
         <section className="stack-md">
           <SectionHeader
-            title="卓メンバー"
-            description="4人卓前提です。まず今回打つ4人を選んでください。"
-          />
-          <StandardCard className="stack-md">
-            <div className="chip-selector">
-              {trip.members.map((member) => {
-                const isSelected = draft.players.includes(member);
-                const isDisabled = !isSelected && draft.players.length >= 4;
-
-                return (
-                  <button
-                    className={`select-chip ${isSelected ? "select-chip--selected" : ""}`}
-                    disabled={isDisabled}
-                    key={member}
-                    type="button"
-                    onClick={() => syncPlayersToGames(
-                      isSelected
-                        ? draft.players.filter((player) => player !== member)
-                        : [...draft.players, member],
-                    )}
-                  >
-                    {member}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="muted-text">4人そろうと自動で1半荘目の入力欄を作ります。</p>
-          </StandardCard>
-        </section>
-
-        <section className="stack-md">
-          <SectionHeader
             title="半荘入力"
-            description="各プレイヤーの持ち点を入力してください。合計10万点から大きくズレていないかも確認できます。"
+            description="半荘ごとに4人を選び、各人の持ち点を入力してください。参加していない人はその半荘では自動的に表で `-` になります。"
           />
-          {draft.players.length !== 4 ? (
-            <EmptyState
-              title="先に4人選んでください"
-              description="卓メンバーが4人になると、ここに点数入力欄が出ます。"
-            />
-          ) : (
-            <div className="stack-md">
-              <div className="inline-cluster">
-                <button className="button button--primary" type="button" onClick={addGame}>
-                  半荘を追加
-                </button>
-                <button className="button button--ghost" type="button" onClick={resetDraft}>
-                  入力をリセット
-                </button>
-              </div>
+          <div className="stack-md">
+            <div className="inline-cluster">
+              <button className="button button--primary" type="button" onClick={addGame}>
+                半荘を追加
+              </button>
+              <button className="button button--ghost" type="button" onClick={resetDraft}>
+                入力をリセット
+              </button>
+            </div>
 
-              {draft.games.map((game, gameIndex) => {
-                const totalPoint = game.results.reduce((sum, result) => sum + result.point, 0);
-                const pointDiff = totalPoint - 100000;
+            {draft.games.map((game, gameIndex) => {
+              const normalized = normalizeDraftGame(game);
+              const totalPoint = normalized.players.reduce(
+                (sum, player) => sum + (Number(normalized.points[player]) || 0),
+                0,
+              );
+              const pointDiff = totalPoint - 100000;
 
-                return (
-                  <StandardCard key={`${game.label}-${gameIndex}`}>
-                    <div className="card-header">
-                      <label className="field field--inline">
-                        <span>半荘名</span>
-                        <input
-                          value={game.label}
-                          onChange={(event) => updateGameLabel(gameIndex, event.target.value)}
-                        />
-                      </label>
-                      <div className="stack-xs">
-                        <strong className={`point-total ${pointDiff === 0 ? "point-total--ok" : "point-total--warn"}`}>
-                          合計 {totalPoint.toLocaleString("ja-JP")}点
-                        </strong>
-                        <button className="button button--ghost" type="button" onClick={() => removeGame(gameIndex)}>
-                          この半荘を削除
-                        </button>
-                      </div>
+              return (
+                <StandardCard key={`${game.label}-${gameIndex}`}>
+                  <div className="card-header">
+                    <label className="field field--inline">
+                      <span>半荘名</span>
+                      <input value={game.label} onChange={(event) => updateGameLabel(gameIndex, event.target.value)} />
+                    </label>
+                    <div className="stack-xs">
+                      <strong className={`point-total ${pointDiff === 0 ? "point-total--ok" : "point-total--warn"}`}>
+                        {normalized.players.length === 4
+                          ? `合計 ${totalPoint.toLocaleString("ja-JP")}点`
+                          : `メンバー ${normalized.players.length}/4人`}
+                      </strong>
+                      <button className="button button--ghost" type="button" onClick={() => removeGame(gameIndex)}>
+                        この半荘を削除
+                      </button>
                     </div>
+                  </div>
 
+                  <div className="stack-xs">
+                    <span className="field-label">参加メンバー</span>
+                    <div className="chip-selector">
+                      {trip.members.map((member) => {
+                        const isSelected = normalized.players.includes(member);
+                        const isDisabled = !isSelected && normalized.players.length >= 4;
+
+                        return (
+                          <button
+                            className={`select-chip ${isSelected ? "select-chip--selected" : ""}`}
+                            disabled={isDisabled}
+                            key={`${game.label}-${member}`}
+                            type="button"
+                            onClick={() => togglePlayer(gameIndex, member)}
+                          >
+                            {member}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {normalized.players.length !== 4 ? (
+                    <EmptyState
+                      title="4人選ぶと点数入力が出ます"
+                      description="この半荘に参加した4人を選んでください。"
+                    />
+                  ) : (
                     <div className="point-grid">
-                      {game.results.map((result) => (
-                        <label className="field" key={`${game.label}-${result.name}`}>
-                          <span>{result.name}</span>
+                      {normalized.players.map((player) => (
+                        <label className="field" key={`${game.label}-${player}`}>
+                          <span>{player}</span>
                           <input
                             inputMode="numeric"
-                            value={`${result.point}`}
-                            onChange={(event) => updatePoint(gameIndex, result.name, event.target.value)}
+                            value={normalized.points[player]}
+                            onChange={(event) => updatePoint(gameIndex, player, event.target.value)}
                           />
                         </label>
                       ))}
                     </div>
-                  </StandardCard>
-                );
-              })}
-            </div>
-          )}
+                  )}
+                </StandardCard>
+              );
+            })}
+          </div>
         </section>
 
         {!summary ? (
           <EmptyState
-            title="まだ集計はありません"
-            description="4人を選んで点数を入力すると、ここから自動で結果が出ます。"
+            title="まだ集計できる半荘がありません"
+            description="4人選択済みの半荘が1つ以上あると、ここから結果表が出ます。"
           />
         ) : (
           <>
             <section className="stack-md">
               <SectionHeader
-                title="最終結果"
-                description="半荘ごとのスコアを合算した最終順位です。"
+                title="個人別プラマイ"
+                description="誰から誰へではなく、各自の最終プラマイだけをペリカ表示でまとめています。"
               />
               <div className="detail-grid">
-                {summary.standings.map((standing, index) => (
-                  <StandardCard key={standing.name} className={index === 0 ? "surface-card--winner" : ""}>
+                {memberTotals.map((member, index) => (
+                  <StandardCard key={member.name} className={index === 0 ? "surface-card--winner" : ""}>
                     <p className="eyebrow">#{index + 1}</p>
-                    <h3>{standing.name}</h3>
-                    <p className="numeric-highlight">
-                      {standing.amount >= 0 ? "+" : ""}
-                      {formatCurrency(standing.amount)}
-                    </p>
+                    <h3>{member.name}</h3>
+                    <p className="numeric-highlight">{formatPelica(member.amount)}</p>
                     <p className="muted-text">
-                      合計スコア {standing.score >= 0 ? "+" : ""}
-                      {formatNumber(standing.score)}
+                      合計スコア {member.score >= 0 ? "+" : ""}
+                      {formatNumber(member.score)}
                     </p>
                   </StandardCard>
                 ))}
@@ -298,67 +308,36 @@ export const MahjongPage = () => {
 
             <section className="stack-md">
               <SectionHeader
-                title="支払い一覧"
-                description="最終収支を相殺した支払い指示です。"
+                title="半荘ごとの一覧表"
+                description="縦が全メンバー、横が各半荘です。参加していない人は `-` で表示します。"
               />
-              <StandardCard className="stack-sm">
-                {summary.payments.length === 0 ? (
-                  <EmptyState
-                    title="支払いはありません"
-                    description="同点か、入力途中の可能性があります。"
-                  />
-                ) : (
-                  summary.payments.map((payment) => (
-                    <div className="payment-row" key={`${payment.from}-${payment.to}`}>
-                      <span>{payment.from}</span>
-                      <strong>
-                        {payment.from} → {payment.to}
-                      </strong>
-                      <span>{formatCurrency(payment.amount)}</span>
-                    </div>
-                  ))
-                )}
-              </StandardCard>
-            </section>
-
-            <section className="stack-md">
-              <SectionHeader
-                title="半荘ごとの結果"
-                description="各半荘の順位、スコア、円換算結果を確認できます。"
-              />
-              <div className="stack-md">
-                {summary.games.map((game) => (
-                  <StandardCard key={game.label}>
-                    <div className="card-header">
-                      <div>
-                        <p className="eyebrow">半荘</p>
-                        <h3>{game.label}</h3>
-                      </div>
-                    </div>
-                    <div className="score-grid">
-                      {game.rows.map((row) => (
-                        <div className="score-row" key={`${game.label}-${row.name}`}>
-                          <div>
-                            <span className="score-row__rank">#{row.rank}</span>
-                            <strong>{row.name}</strong>
-                          </div>
-                          <div className="score-row__details">
-                            <span>{row.point.toLocaleString("ja-JP")}点</span>
-                            <span>
-                              {row.totalScore >= 0 ? "+" : ""}
-                              {formatNumber(row.totalScore)}
-                            </span>
-                            <strong>
-                              {row.amount >= 0 ? "+" : ""}
-                              {formatCurrency(row.amount)}
-                            </strong>
-                          </div>
-                        </div>
+              <StandardCard>
+                <div className="table-scroll">
+                  <table className="result-table">
+                    <thead>
+                      <tr>
+                        <th>名前</th>
+                        {perGameAmounts.map((game) => (
+                          <th key={game.label}>{game.label}</th>
+                        ))}
+                        <th>合計</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {memberTotals.map((member) => (
+                        <tr key={member.name}>
+                          <th>{member.name}</th>
+                          {perGameAmounts.map((game) => {
+                            const amount = game.amounts[member.name];
+                            return <td key={`${member.name}-${game.label}`}>{amount === undefined ? "-" : formatPelica(amount)}</td>;
+                          })}
+                          <td className="result-table__total">{formatPelica(member.amount)}</td>
+                        </tr>
                       ))}
-                    </div>
-                  </StandardCard>
-                ))}
-              </div>
+                    </tbody>
+                  </table>
+                </div>
+              </StandardCard>
             </section>
           </>
         )}

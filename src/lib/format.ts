@@ -20,6 +20,9 @@ const yearMonthDayFormatter = new Intl.DateTimeFormat("ja-JP", {
 export const formatCurrency = (amount: number) =>
   `${yenFormatter.format(Math.round(amount))}円`;
 
+export const formatPelica = (amount: number) =>
+  `${amount >= 0 ? "+" : "-"}${yenFormatter.format(Math.abs(Math.round(amount)))}ペリカ`;
+
 export const formatNumber = (value: number, digits = 1) =>
   new Intl.NumberFormat("ja-JP", {
     minimumFractionDigits: digits,
