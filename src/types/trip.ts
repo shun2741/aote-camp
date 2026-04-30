@@ -28,6 +28,7 @@ export type LinkItem = {
 
 export type HotelHighlight = {
   name: string;
+  icon?: "tennis" | "golf" | "mahjong" | "bath";
   description?: string;
   note?: string;
   details?: string[];

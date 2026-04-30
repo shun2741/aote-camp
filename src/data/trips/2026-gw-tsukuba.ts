@@ -138,6 +138,7 @@ export const tsukubaGw2026Trip: Trip = {
       highlights: [
         {
           name: "テニスコート",
+          icon: "tennis",
           description: "屋外オムニコート6面。宿泊者は電話予約で確保。",
           details: [
             "営業時間は9:00〜17:00",
@@ -149,6 +150,7 @@ export const tsukubaGw2026Trip: Trip = {
         },
         {
           name: "ゴルフ練習場",
+          icon: "golf",
           description: "屋外26打席。空き時間に入れやすいサブプラン。",
           details: [
             "営業時間は9:00〜20:00",
@@ -160,6 +162,7 @@ export const tsukubaGw2026Trip: Trip = {
         },
         {
           name: "麻雀室",
+          icon: "mahjong",
           description: "夜のメイン。地下1階に全自動麻雀卓を5卓設置。",
           details: [
             "利用時間は13:00〜翌12:00",
@@ -171,6 +174,7 @@ export const tsukubaGw2026Trip: Trip = {
         },
         {
           name: "天然温泉",
+          icon: "bath",
           description: "テニス後に使いやすい館内温泉。",
           details: [
             "2F大浴場 11:00〜21:00（最終受付20:00）",

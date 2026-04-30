@@ -616,9 +616,34 @@ a.button {
   padding: 18px 18px 20px;
 }
 
+.illustration-card__heading,
+.facility-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .illustration-card__body h3,
 .illustration-card__body p {
   margin: 0;
+}
+
+.icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  color: var(--color-primary-dark);
+  background: linear-gradient(180deg, rgba(135, 213, 204, 0.24), rgba(255, 231, 214, 0.72));
+  border: 1px solid rgba(135, 213, 204, 0.42);
+  flex-shrink: 0;
+}
+
+.icon-chip__icon {
+  width: 19px;
+  height: 19px;
 }
 
 .metric-grid,
@@ -661,8 +686,28 @@ a.button {
 }
 
 .note-card {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 10px;
   line-height: 1.7;
   color: var(--color-text);
+}
+
+.note-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-top: 1px;
+  border-radius: 10px;
+  color: var(--color-primary-dark);
+  background: rgba(135, 213, 204, 0.18);
+}
+
+.note-card__icon-svg {
+  width: 16px;
+  height: 16px;
 }
 
 .facility-card h3 {

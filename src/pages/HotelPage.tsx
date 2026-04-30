@@ -3,6 +3,7 @@ import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { EmptyState } from "../components/EmptyState";
 import { HeroCard } from "../components/HeroCard";
+import { InfoIcon } from "../components/InfoIcon";
 import { IllustrationCard } from "../components/IllustrationCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
@@ -150,6 +151,9 @@ export const HotelPage = () => {
                       <div className="stack-xs">
                         {hotel.accessNotes.map((note) => (
                           <div className="note-card" key={note}>
+                            <span className="note-card__icon" aria-hidden="true">
+                              <InfoIcon name="route" className="note-card__icon-svg" />
+                            </span>
                             {note}
                           </div>
                         ))}
@@ -167,7 +171,12 @@ export const HotelPage = () => {
                         {hotel.highlights.map((spot) => (
                           <div className="facility-card" key={spot.name}>
                             <div className="stack-xs">
-                              <div className="inline-cluster">
+                              <div className="inline-cluster facility-card__header">
+                                {spot.icon ? (
+                                  <span className="icon-chip" aria-hidden="true">
+                                    <InfoIcon name={spot.icon} className="icon-chip__icon" />
+                                  </span>
+                                ) : null}
                                 <p className="eyebrow">Hotel</p>
                               </div>
                               <h3>{spot.name}</h3>

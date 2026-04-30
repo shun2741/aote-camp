@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { InfoIcon } from "./InfoIcon";
 
 type IllustrationCardProps = {
   src: string;
@@ -6,6 +7,7 @@ type IllustrationCardProps = {
   eyebrow: string;
   title: string;
   description: string;
+  icon?: "image";
 };
 
 export const IllustrationCard = ({
@@ -14,8 +16,10 @@ export const IllustrationCard = ({
   eyebrow,
   title,
   description,
+  icon = "image",
 }: IllustrationCardProps) => {
   const [hasError, setHasError] = useState(false);
+  const resolvedSrc = src.startsWith("/") ? `${import.meta.env.BASE_URL}${src.slice(1)}` : src;
 
   return (
     <section className="illustration-card">
@@ -29,14 +33,19 @@ export const IllustrationCard = ({
       ) : (
         <img
           className="illustration-card__image"
-          src={src}
+          src={resolvedSrc}
           alt={alt}
           onError={() => setHasError(true)}
         />
       )}
       <div className="illustration-card__body">
         <p className="eyebrow">{eyebrow}</p>
-        <h3>{title}</h3>
+        <div className="illustration-card__heading">
+          <span className="icon-chip" aria-hidden="true">
+            <InfoIcon name={icon} className="icon-chip__icon" />
+          </span>
+          <h3>{title}</h3>
+        </div>
         <p>{description}</p>
       </div>
     </section>
