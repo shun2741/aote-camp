@@ -402,7 +402,9 @@ a.button {
 }
 
 .metric-card,
-.room-card {
+.room-card,
+.note-card,
+.food-spot-card {
   display: grid;
   gap: 6px;
   padding: 14px 16px;
@@ -424,6 +426,19 @@ a.button {
 .metric-card strong,
 .compact-metrics strong {
   color: var(--color-primary-dark);
+}
+
+.note-card {
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.food-spot-card h3 {
+  margin: 0;
+}
+
+.food-spot-card p {
+  margin: 0;
 }
 
 .trip-grid,

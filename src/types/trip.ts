@@ -21,16 +21,37 @@ export type Room = {
   members: string[];
 };
 
+export type LinkItem = {
+  label: string;
+  url: string;
+};
+
+export type FoodSpot = {
+  name: string;
+  description?: string;
+  address?: string;
+  hours?: string;
+  note?: string;
+  url?: string;
+};
+
 export type Hotel = {
   name: string;
   stayDates: string[];
   checkIn?: string;
   checkOut?: string;
   address?: string;
+  phone?: string;
   mapUrl?: string;
   officialUrl?: string;
   bookingName?: string;
+  planName?: string;
+  roomType?: string;
+  priceNote?: string;
   rooms?: Room[];
+  accessNotes?: string[];
+  links?: LinkItem[];
+  nearbyFood?: FoodSpot[];
   parkingMemo?: string;
   memo?: string;
 };

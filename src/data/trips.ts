@@ -1,8 +1,8 @@
-import { hokkaido2027Trip } from "./trips/2027-hokkaido";
+import { tsukubaGw2026Trip } from "./trips/2026-gw-tsukuba";
 import { kagawa2026Trip } from "./trips/2026-kagawa";
 import { nagano2025Trip } from "./trips/2025-nagano";
 
-export const trips = [hokkaido2027Trip, kagawa2026Trip, nagano2025Trip].sort(
+export const trips = [tsukubaGw2026Trip, kagawa2026Trip, nagano2025Trip].sort(
   (left, right) => right.startDate.localeCompare(left.startDate),
 );
 

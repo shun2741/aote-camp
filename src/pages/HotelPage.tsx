@@ -72,10 +72,34 @@ export const HotelPage = () => {
                       <dt>宿泊日</dt>
                       <dd>{hotel.stayDates.map(formatDateWithWeekday).join(" / ")}</dd>
                     </div>
+                    {hotel.planName ? (
+                      <div>
+                        <dt>プラン</dt>
+                        <dd>{hotel.planName}</dd>
+                      </div>
+                    ) : null}
+                    {hotel.roomType ? (
+                      <div>
+                        <dt>部屋タイプ</dt>
+                        <dd>{hotel.roomType}</dd>
+                      </div>
+                    ) : null}
+                    {hotel.priceNote ? (
+                      <div>
+                        <dt>料金メモ</dt>
+                        <dd>{hotel.priceNote}</dd>
+                      </div>
+                    ) : null}
                     {hotel.address ? (
                       <div>
                         <dt>住所</dt>
                         <dd>{hotel.address}</dd>
+                      </div>
+                    ) : null}
+                    {hotel.phone ? (
+                      <div>
+                        <dt>電話</dt>
+                        <dd>{hotel.phone}</dd>
                       </div>
                     ) : null}
                     {hotel.bookingName ? (
@@ -98,7 +122,7 @@ export const HotelPage = () => {
                     ) : null}
                   </dl>
 
-                  {hotel.rooms?.length ? (
+                    {hotel.rooms?.length ? (
                     <div className="stack-sm">
                       <SectionHeader title="部屋割り" />
                       <div className="detail-grid">
@@ -109,6 +133,82 @@ export const HotelPage = () => {
                           </div>
                         ))}
                       </div>
+                    </div>
+                  ) : null}
+
+                  {hotel.accessNotes?.length ? (
+                    <div className="stack-sm">
+                      <SectionHeader title="アクセス" />
+                      <div className="stack-xs">
+                        {hotel.accessNotes.map((note) => (
+                          <div className="note-card" key={note}>
+                            {note}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {hotel.nearbyFood?.length ? (
+                    <div className="stack-sm">
+                      <SectionHeader
+                        title="ごはん候補"
+                        description="5月5日（火）に寄れそうな候補を優先して掲載。"
+                      />
+                      <div className="stack-sm">
+                        {hotel.nearbyFood.map((spot) => (
+                          <div className="food-spot-card" key={spot.name}>
+                            <div className="stack-xs">
+                              <div className="inline-cluster">
+                                <p className="eyebrow">Food</p>
+                              </div>
+                              <h3>{spot.name}</h3>
+                              {spot.description ? <p>{spot.description}</p> : null}
+                            </div>
+                            <dl className="detail-list">
+                              {spot.address ? (
+                                <div>
+                                  <dt>住所</dt>
+                                  <dd>{spot.address}</dd>
+                                </div>
+                              ) : null}
+                              {spot.hours ? (
+                                <div>
+                                  <dt>営業時間</dt>
+                                  <dd>{spot.hours}</dd>
+                                </div>
+                              ) : null}
+                              {spot.note ? (
+                                <div>
+                                  <dt>メモ</dt>
+                                  <dd>{spot.note}</dd>
+                                </div>
+                              ) : null}
+                            </dl>
+                            {spot.url ? (
+                              <a className="button button--ghost" href={spot.url} target="_blank" rel="noreferrer">
+                                お店を見る
+                              </a>
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {hotel.links?.length ? (
+                    <div className="inline-cluster">
+                      {hotel.links.map((link) => (
+                        <a
+                          className="button button--secondary"
+                          href={link.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          key={link.label}
+                        >
+                          {link.label}
+                        </a>
+                      ))}
                     </div>
                   ) : null}
 
