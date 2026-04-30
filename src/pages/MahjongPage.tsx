@@ -8,9 +8,9 @@ import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
 import { getTripById } from "../data/trips";
 import { usePersistentState } from "../hooks/usePersistentState";
-import { formatNumber, formatPelica } from "../lib/format";
+import { formatNumber } from "../lib/format";
 import { calculateMahjongSummary } from "../lib/mahjong";
-import type { MahjongGame, MahjongPlayerResult, Trip } from "../types/trip";
+import type { MahjongPlayerResult, Trip } from "../types/trip";
 import { NotFoundPage } from "./NotFoundPage";
 
 type MahjongDraftGame = {
@@ -174,33 +174,33 @@ export const MahjongPage = () => {
       const safeCurrent = migrateMahjongDraftState(current as unknown, trip);
       return {
         games: safeCurrent.games.map((game, currentIndex) => {
-        if (currentIndex !== gameIndex) {
-          return game;
-        }
+          if (currentIndex !== gameIndex) {
+            return game;
+          }
 
-        const exists = game.players.includes(member);
+          const exists = game.players.includes(member);
 
-        if (exists) {
+          if (exists) {
+            return {
+              ...game,
+              players: game.players.filter((player) => player !== member),
+            };
+          }
+
+          if (game.players.length >= 4) {
+            return game;
+          }
+
           return {
             ...game,
-            players: game.players.filter((player) => player !== member),
+            players: [...game.players, member],
+            points: {
+              ...game.points,
+              [member]: game.points[member] ?? `${defaultRule.startPoint}`,
+            },
           };
-        }
-
-        if (game.players.length >= 4) {
-          return game;
-        }
-
-        return {
-          ...game,
-          players: [...game.players, member],
-          points: {
-            ...game.points,
-            [member]: game.points[member] ?? `${defaultRule.startPoint}`,
-          },
-        };
-      }),
-    };
+        }),
+      };
     });
   };
 
@@ -209,17 +209,17 @@ export const MahjongPage = () => {
       const safeCurrent = migrateMahjongDraftState(current as unknown, trip);
       return {
         games: safeCurrent.games.map((game, currentIndex) =>
-        currentIndex === gameIndex
-          ? {
-              ...game,
-              points: {
-                ...game.points,
-                [playerName]: rawValue,
-              },
-            }
-          : game,
-      ),
-    };
+          currentIndex === gameIndex
+            ? {
+                ...game,
+                points: {
+                  ...game.points,
+                  [playerName]: rawValue,
+                },
+              }
+            : game,
+        ),
+      };
     });
   };
 
@@ -249,18 +249,17 @@ export const MahjongPage = () => {
       const standing = summary?.standings.find((entry) => entry.name === member);
       return {
         name: member,
-        amount: standing?.amount ?? 0,
         score: standing?.score ?? 0,
       };
     })
-    .sort((left, right) => right.amount - left.amount);
+    .sort((left, right) => right.score - left.score);
 
-  const perGameAmounts = migratedDraft.games.map((game, draftIndex) => {
+  const perGameScores = migratedDraft.games.map((game, draftIndex) => {
     const summaryIndex = completedGames.findIndex((entry) => entry.gameIndex === draftIndex);
     const rows = summaryIndex >= 0 ? summary?.games[summaryIndex]?.rows ?? [] : [];
     return {
       label: game.label,
-      amounts: Object.fromEntries(rows.map((row) => [row.name, row.amount])),
+      scores: Object.fromEntries(rows.map((row) => [row.name, row.totalScore])),
     };
   });
 
@@ -276,7 +275,7 @@ export const MahjongPage = () => {
         <HeroCard
           eyebrow={trip.destination}
           title="麻雀精算"
-          description="半荘ごとに卓メンバーを切り替えて入力できます。集計はペリカ表示で、全員分を1つの表にまとめています。"
+          description="半荘ごとに卓メンバーを切り替えて入力できます。金額換算はせず、全員分の点ベース集計を1つの表にまとめています。"
           meta={[
             { label: "ルール", value: "1・2の点5" },
             { label: "半荘数", value: `${migratedDraft.games.length}` },
@@ -383,18 +382,18 @@ export const MahjongPage = () => {
             <section className="stack-md">
               <SectionHeader
                 title="個人別プラマイ"
-                description="誰から誰へではなく、各自の最終プラマイだけをペリカ表示でまとめています。"
+                description="レート換算はせず、各自の合計スコアだけを表示しています。"
               />
               <div className="detail-grid">
                 {memberTotals.map((member, index) => (
                   <StandardCard key={member.name} className={index === 0 ? "surface-card--winner" : ""}>
                     <p className="eyebrow">#{index + 1}</p>
                     <h3>{member.name}</h3>
-                    <p className="numeric-highlight">{formatPelica(member.amount)}</p>
-                    <p className="muted-text">
-                      合計スコア {member.score >= 0 ? "+" : ""}
+                    <p className="numeric-highlight">
+                      {member.score >= 0 ? "+" : ""}
                       {formatNumber(member.score)}
                     </p>
+                    <p className="muted-text">合計スコア</p>
                   </StandardCard>
                 ))}
               </div>
@@ -411,7 +410,7 @@ export const MahjongPage = () => {
                     <thead>
                       <tr>
                         <th>名前</th>
-                        {perGameAmounts.map((game) => (
+                        {perGameScores.map((game) => (
                           <th key={game.label}>{game.label}</th>
                         ))}
                         <th>合計</th>
@@ -421,11 +420,18 @@ export const MahjongPage = () => {
                       {memberTotals.map((member) => (
                         <tr key={member.name}>
                           <th>{member.name}</th>
-                          {perGameAmounts.map((game) => {
-                            const amount = game.amounts[member.name];
-                            return <td key={`${member.name}-${game.label}`}>{amount === undefined ? "-" : formatPelica(amount)}</td>;
+                          {perGameScores.map((game) => {
+                            const score = game.scores[member.name];
+                            return (
+                              <td key={`${member.name}-${game.label}`}>
+                                {score === undefined ? "-" : `${score >= 0 ? "+" : ""}${formatNumber(score)}`}
+                              </td>
+                            );
                           })}
-                          <td className="result-table__total">{formatPelica(member.amount)}</td>
+                          <td className="result-table__total">
+                            {member.score >= 0 ? "+" : ""}
+                            {formatNumber(member.score)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

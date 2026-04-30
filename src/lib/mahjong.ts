@@ -3,7 +3,6 @@ import type {
   MahjongGame,
   MahjongPlayerResult,
 } from "../types/trip";
-import { buildSettlementPayments } from "./settlement";
 
 export type MahjongGameRow = {
   name: string;
@@ -13,7 +12,6 @@ export type MahjongGameRow = {
   umaScore: number;
   okaScore: number;
   totalScore: number;
-  amount: number;
 };
 
 export type MahjongGameSummary = {
@@ -24,7 +22,6 @@ export type MahjongGameSummary = {
 export type MahjongStanding = {
   name: string;
   score: number;
-  amount: number;
 };
 
 export type MahjongSummary = {
@@ -32,11 +29,6 @@ export type MahjongSummary = {
   gameCount: number;
   standings: MahjongStanding[];
   games: MahjongGameSummary[];
-  payments: Array<{
-    from: string;
-    to: string;
-    amount: number;
-  }>;
 };
 
 const resolveRanks = (results: MahjongPlayerResult[]): MahjongPlayerResult[] => {
@@ -70,7 +62,6 @@ const summarizeGame = (game: MahjongGame, data: MahjongData): MahjongGameSummary
       const umaScore = data.rule.uma[rank - 1];
       const okaScore = rank === 1 ? data.rule.oka : 0;
       const totalScore = rawScore + umaScore + okaScore;
-      const amount = Math.round(totalScore * data.rule.rate * 100);
 
       return {
         name: result.name,
@@ -80,7 +71,6 @@ const summarizeGame = (game: MahjongGame, data: MahjongData): MahjongGameSummary
         umaScore,
         okaScore,
         totalScore,
-        amount,
       };
     })
     .sort((left, right) => left.rank - right.rank);
@@ -100,27 +90,19 @@ export const calculateMahjongSummary = (data: MahjongData): MahjongSummary => {
       const current = totals.get(row.name) ?? {
         name: row.name,
         score: 0,
-        amount: 0,
       };
 
       current.score += row.totalScore;
-      current.amount += row.amount;
       totals.set(row.name, current);
     });
   });
 
-  const standings = [...totals.values()].sort((left, right) => right.amount - left.amount);
+  const standings = [...totals.values()].sort((left, right) => right.score - left.score);
 
   return {
     title: data.title,
     gameCount: games.length,
     standings,
     games,
-    payments: buildSettlementPayments(
-      standings.map((standing) => ({
-        name: standing.name,
-        net: standing.amount,
-      })),
-    ),
   };
 };
