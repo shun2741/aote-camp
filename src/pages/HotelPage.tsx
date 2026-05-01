@@ -4,7 +4,6 @@ import { BottomNavigation } from "../components/BottomNavigation";
 import { EmptyState } from "../components/EmptyState";
 import { HeroCard } from "../components/HeroCard";
 import { InfoIcon } from "../components/InfoIcon";
-import { IllustrationCard } from "../components/IllustrationCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { StandardCard } from "../components/StandardCard";
 import { getTripById } from "../data/trips";
@@ -31,7 +30,8 @@ export const HotelPage = () => {
         <HeroCard
           eyebrow={trip.destination}
           title="宿泊情報"
-          description="チェックイン、部屋割り、アクセス情報をその場で開けるように整理。"
+          icon="hotel"
+          backgroundImage="/hotel-lakeside-guide.png"
           meta={[
             { label: "宿数", value: `${trip.hotels.length}` },
             { label: "期間", value: formatDateRange(trip.startDate, trip.endDate) },
@@ -39,17 +39,7 @@ export const HotelPage = () => {
         />
 
         <section className="stack-md">
-          <SectionHeader
-            title="宿泊情報"
-            description="予約番号のような機微情報は載せず、必要な情報だけをまとめています。"
-          />
-          <IllustrationCard
-            src="/hotel-lakeside-guide.png"
-            alt="ホテルレイクサイドつくばの設備イメージ"
-            eyebrow="宿のイメージ"
-            title="駐車場、コート、温泉、麻雀室の位置感を先に掴む"
-            description="ホテルページの先頭で全体像を把握する用途です。実写よりも案内図っぽく使う前提で置いています。"
-          />
+          <SectionHeader title="宿泊情報" />
           {trip.hotels.length === 0 ? (
             <EmptyState
               title="まだホテル情報がありません"
@@ -163,10 +153,7 @@ export const HotelPage = () => {
 
                   {hotel.highlights?.length ? (
                     <div className="stack-sm">
-                      <SectionHeader
-                        title="あると助かる情報"
-                        description="現地で迷いそうな設備情報だけを抜き出しています。"
-                      />
+                      <SectionHeader title="あると助かる情報" />
                       <div className="stack-sm">
                         {hotel.highlights.map((spot) => (
                           <div className="facility-card" key={spot.name}>

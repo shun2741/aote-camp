@@ -37,7 +37,7 @@ export const AppShell = ({
           </div>
         </div>
         <Link className="brand-chip" to="/">
-          旅行一覧
+          トップ
         </Link>
       </div>
     </header>

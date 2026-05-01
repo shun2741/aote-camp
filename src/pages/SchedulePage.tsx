@@ -29,7 +29,7 @@ export const SchedulePage = () => {
         <HeroCard
           eyebrow={trip.destination}
           title="日別スケジュール"
-          description="集合、移動、食事、麻雀まで、スマホで追いやすいタイムライン表示。"
+          icon="schedule"
           meta={[
             { label: "日数", value: `${trip.schedule.length}` },
             { label: "期間", value: formatDateRange(trip.startDate, trip.endDate) },
@@ -37,10 +37,7 @@ export const SchedulePage = () => {
         />
 
         <section className="stack-md">
-          <SectionHeader
-            title="予定一覧"
-            description="時刻未定の予定も同じ流れで見られるタイムラインです。"
-          />
+          <SectionHeader title="予定一覧" />
           {trip.schedule.length === 0 ? (
             <EmptyState
               title="まだスケジュールが登録されていません"

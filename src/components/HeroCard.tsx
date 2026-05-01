@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { InfoIcon, type InfoIconName } from "./InfoIcon";
 
 type HeroCardProps = {
   eyebrow?: string;
@@ -6,6 +7,8 @@ type HeroCardProps = {
   description?: string;
   meta?: Array<{ label: string; value: string }>;
   actions?: ReactNode;
+  icon?: InfoIconName;
+  backgroundImage?: string;
 };
 
 export const HeroCard = ({
@@ -14,11 +17,30 @@ export const HeroCard = ({
   description,
   meta,
   actions,
+  icon,
+  backgroundImage,
 }: HeroCardProps) => (
-  <section className="hero-card">
+  <section className={`hero-card ${backgroundImage ? "hero-card--with-image" : ""}`.trim()}>
+    {backgroundImage ? (
+      <div
+        className="hero-card__media"
+        style={{
+          backgroundImage: `url(${backgroundImage.startsWith("/") ? `${import.meta.env.BASE_URL}${backgroundImage.slice(1)}` : backgroundImage})`,
+        }}
+      />
+    ) : null}
     <div className="hero-card__backdrop" />
     <div className="hero-card__content">
-      {eyebrow ? <p className="hero-card__eyebrow">{eyebrow}</p> : null}
+      {eyebrow || icon ? (
+        <div className="hero-card__lead">
+          {icon ? (
+            <span className="icon-chip hero-card__icon" aria-hidden="true">
+              <InfoIcon name={icon} className="icon-chip__icon" />
+            </span>
+          ) : null}
+          {eyebrow ? <p className="hero-card__eyebrow">{eyebrow}</p> : null}
+        </div>
+      ) : null}
       <h1 className="hero-card__title">{title}</h1>
       {description ? <p className="hero-card__description">{description}</p> : null}
       {meta?.length ? (

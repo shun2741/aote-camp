@@ -182,6 +182,10 @@ a.button {
   box-shadow: var(--shadow-hover);
 }
 
+.hero-card--with-image {
+  min-height: 320px;
+}
+
 .hero-card::before,
 .hero-card::after {
   content: "";
@@ -216,10 +220,36 @@ a.button {
   pointer-events: none;
 }
 
+.hero-card--with-image .hero-card__backdrop {
+  background:
+    linear-gradient(90deg, rgba(255, 250, 245, 0.94) 0%, rgba(255, 250, 245, 0.78) 38%, rgba(255, 250, 245, 0.22) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+}
+
+.hero-card__media {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform: scale(1.02);
+}
+
 .hero-card__content {
   position: relative;
   display: grid;
   gap: 18px;
+}
+
+.hero-card__lead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-card__icon {
+  width: 38px;
+  height: 38px;
 }
 
 .hero-card__eyebrow,
@@ -793,8 +823,13 @@ a.button {
   border-radius: 18px;
   background: linear-gradient(160deg, var(--color-accent-peach), var(--color-accent));
   color: white;
-  font-weight: 800;
   box-shadow: 0 10px 24px rgba(127, 200, 248, 0.22);
+}
+
+.action-card__icon-svg,
+.bottom-nav__icon-svg {
+  width: 22px;
+  height: 22px;
 }
 
 .tag {
@@ -1208,7 +1243,6 @@ a.button {
   border-radius: 12px;
   background: linear-gradient(160deg, rgba(243, 165, 142, 0.22), rgba(127, 200, 248, 0.22));
   color: var(--color-primary-dark);
-  font-weight: 800;
 }
 
 @media (min-width: 720px) {

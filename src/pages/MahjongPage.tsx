@@ -291,7 +291,7 @@ export const MahjongPage = () => {
         <HeroCard
           eyebrow={trip.destination}
           title="麻雀精算"
-          description="半荘ごとに卓メンバーを切り替えて入力できます。金額換算はせず、全員分の点ベース集計を1つの表にまとめています。"
+          icon="mahjong"
           meta={[
             { label: "ルール", value: "1・2の点5" },
             { label: "半荘数", value: `${migratedDraft.games.length}` },
@@ -300,10 +300,7 @@ export const MahjongPage = () => {
         />
 
         <section className="stack-md">
-          <SectionHeader
-            title="半荘入力"
-            description="半荘ごとに4人を選び、各人の持ち点を入力してください。参加していない人はその半荘では自動的に表で `-` になります。"
-          />
+          <SectionHeader title="半荘入力" />
           <div className="stack-md">
             <div className="inline-cluster">
               <button className="button button--primary" type="button" onClick={addGame}>
@@ -396,10 +393,7 @@ export const MahjongPage = () => {
         ) : (
           <>
             <section className="stack-md">
-              <SectionHeader
-                title="個人別プラマイ"
-                description="レート換算はせず、各自の合計スコアだけを表示しています。"
-              />
+              <SectionHeader title="個人別プラマイ" />
               <div className="detail-grid">
                 {memberTotals.map((member, index) => (
                   <StandardCard key={member.name} className={index === 0 ? "surface-card--winner" : ""}>
@@ -416,10 +410,7 @@ export const MahjongPage = () => {
             </section>
 
             <section className="stack-md">
-              <SectionHeader
-                title="半荘ごとの一覧表"
-                description="縦が全メンバー、横が各半荘です。参加していない人は `-` で表示します。"
-              />
+              <SectionHeader title="半荘ごとの一覧表" />
               <StandardCard>
                 <div className="table-scroll">
                   <table className="result-table">

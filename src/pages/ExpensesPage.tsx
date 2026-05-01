@@ -134,7 +134,7 @@ export const ExpensesPage = () => {
         <HeroCard
           eyebrow={trip.destination}
           title="経費と割り勘"
-          description="画面上で立替を追加しながら、その場で最終精算額まで確認できます。入力内容はこの端末に保存されます。"
+          icon="expenses"
           meta={[
             { label: "総額", value: formatCurrency(summary.totalAmount) },
             { label: "件数", value: `${draftExpenses.length}` },
@@ -143,10 +143,7 @@ export const ExpensesPage = () => {
         />
 
         <section className="stack-md">
-          <SectionHeader
-            title="経費を入力"
-            description="立替えた人、対象メンバー、カテゴリまで入れるとそのまま精算に反映されます。"
-          />
+          <SectionHeader title="経費を入力" />
           <StandardCard className="stack-md">
             <div className="form-grid">
               <label className="field">
@@ -243,10 +240,7 @@ export const ExpensesPage = () => {
         </section>
 
         <section className="stack-md">
-          <SectionHeader
-            title="メンバー別まとめ"
-            description="支払済額、本来負担額、差額をメンバーごとに見比べられます。"
-          />
+          <SectionHeader title="メンバー別まとめ" />
           <div className="detail-grid">
             {summary.balances.map((balance) => (
               <StandardCard key={balance.name}>
@@ -272,10 +266,7 @@ export const ExpensesPage = () => {
         </section>
 
         <section className="stack-md">
-          <SectionHeader
-            title="精算結果"
-            description="誰が誰にいくら払えば終わるかをわかりやすく表示します。"
-          />
+          <SectionHeader title="精算結果" />
           <StandardCard className="stack-sm">
             {summary.payments.length === 0 ? (
               <EmptyState
@@ -297,10 +288,7 @@ export const ExpensesPage = () => {
         </section>
 
         <section className="stack-md">
-          <SectionHeader
-            title="経費一覧"
-            description="追加した経費をその場で編集・削除できます。"
-          />
+          <SectionHeader title="経費一覧" />
           {draftExpenses.length === 0 ? (
             <EmptyState
               title="経費はまだありません"

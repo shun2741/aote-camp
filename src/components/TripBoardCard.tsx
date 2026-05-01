@@ -7,7 +7,7 @@ type TripBoardMoment = {
 type TripBoardCardProps = {
   title: string;
   subtitle: string;
-  note: string;
+  note?: string;
   moments: TripBoardMoment[];
   stats?: Array<{ label: string; value: string }>;
 };
@@ -29,7 +29,7 @@ export const TripBoardCard = ({
       </div>
       <p className="eyebrow">{subtitle}</p>
       <h2>{title}</h2>
-      <p>{note}</p>
+      {note ? <p>{note}</p> : null}
     </div>
 
     <div className="trip-board-card__content">

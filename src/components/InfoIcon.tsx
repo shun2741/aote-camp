@@ -1,4 +1,9 @@
-type InfoIconName =
+export type InfoIconName =
+  | "trip"
+  | "schedule"
+  | "hotel"
+  | "expenses"
+  | "people"
   | "image"
   | "route"
   | "tennis"
@@ -13,6 +18,51 @@ type InfoIconProps = {
 
 export const InfoIcon = ({ name, className }: InfoIconProps) => {
   switch (name) {
+    case "trip":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M4.5 8.5L12 5l7.5 3.5v8L12 20l-7.5-3.5z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path d="M12 5v15M4.5 8.5L12 12l7.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+        </svg>
+      );
+    case "schedule":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="4" y="5.5" width="16" height="14.5" rx="3" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M8 4v3M16 4v3M4 10h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M8 13h3M8 16.5h7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      );
+    case "hotel":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4.5 19V7.5A2.5 2.5 0 0 1 7 5h10a2.5 2.5 0 0 1 2.5 2.5V19" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M4.5 14h15M8 10h2M14 10h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M3.5 19.5h17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      );
+    case "expenses":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="4" y="6" width="16" height="12" rx="3" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M15 10h3M15 14h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="9.5" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+        </svg>
+      );
+    case "people":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="9" cy="9" r="3" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M4.5 18a4.5 4.5 0 0 1 9 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="16.5" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M14.5 18a3.7 3.7 0 0 1 5 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      );
     case "image":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
