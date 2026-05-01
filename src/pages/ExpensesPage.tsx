@@ -24,6 +24,14 @@ type ExpenseFormState = {
   memo: string;
 };
 
+const normalizeAmountInput = (value: string) =>
+  value
+    .replace(/[０-９]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+    .replace(/[，、]/g, ",")
+    .replace(/[．。]/g, ".")
+    .replace(/[円\s]/g, "")
+    .replace(/,/g, "");
+
 const makeInitialFormState = (members: string[]): ExpenseFormState => ({
   title: "",
   amount: "",
@@ -33,8 +41,26 @@ const makeInitialFormState = (members: string[]): ExpenseFormState => ({
   memo: "",
 });
 
+const getExpenseValidationMessage = (form: ExpenseFormState) => {
+  const amount = Number(normalizeAmountInput(form.amount));
+
+  if (!form.title.trim()) {
+    return "項目名を入力してください。";
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return "金額は 1000 や 1,000 のように入力してください。";
+  }
+
+  if (form.participants.length === 0) {
+    return "対象メンバーを1人以上選んでください。";
+  }
+
+  return null;
+};
+
 const toExpensePayload = (form: ExpenseFormState): Expense | null => {
-  const amount = Number(form.amount);
+  const amount = Number(normalizeAmountInput(form.amount));
 
   if (!form.title.trim() || !Number.isFinite(amount) || amount <= 0 || form.participants.length === 0) {
     return null;
@@ -64,11 +90,13 @@ export const ExpensesPage = () => {
   );
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [formState, setFormState] = useState<ExpenseFormState>(() => makeInitialFormState(trip.members));
+  const [formError, setFormError] = useState<string | null>(null);
   const summary = calculateExpenseSummary(trip.members, draftExpenses);
 
   const resetForm = () => {
     setEditingIndex(null);
     setFormState(makeInitialFormState(trip.members));
+    setFormError(null);
   };
 
   const handleParticipantToggle = (member: string) => {
@@ -86,12 +114,21 @@ export const ExpensesPage = () => {
   };
 
   const handleSubmit = () => {
-    const nextExpense = toExpensePayload(formState);
+    const validationMessage = getExpenseValidationMessage(formState);
 
-    if (!nextExpense) {
+    if (validationMessage) {
+      setFormError(validationMessage);
       return;
     }
 
+    const nextExpense = toExpensePayload(formState);
+
+    if (!nextExpense) {
+      setFormError("入力内容を確認してください。");
+      return;
+    }
+
+    setFormError(null);
     setDraftExpenses((current) => {
       if (editingIndex === null) {
         return [...current, nextExpense];
@@ -159,7 +196,10 @@ export const ExpensesPage = () => {
                 <input
                   inputMode="numeric"
                   value={formState.amount}
-                  onChange={(event) => setFormState((current) => ({ ...current, amount: event.target.value }))}
+                  onChange={(event) => {
+                    setFormError(null);
+                    setFormState((current) => ({ ...current, amount: event.target.value }));
+                  }}
                   placeholder="例: 124260"
                 />
               </label>
@@ -224,6 +264,8 @@ export const ExpensesPage = () => {
                 placeholder="例: 7人分 / クーポン適用後"
               />
             </label>
+
+            {formError ? <p className="form-error">{formError}</p> : null}
 
             <div className="inline-cluster">
               <button className="button button--primary" type="button" onClick={handleSubmit}>
