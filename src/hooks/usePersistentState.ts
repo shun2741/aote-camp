@@ -23,11 +23,11 @@ export const usePersistentState = <T,>(storageKey: string, initialValue: T) => {
   }, [storageKey, value]);
 
   const resetValue = () => {
-    setValue(initialValue);
-
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(storageKey);
     }
+
+    setValue(initialValue);
   };
 
   return [value, setValue, resetValue] as const;

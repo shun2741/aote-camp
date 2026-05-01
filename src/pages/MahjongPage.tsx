@@ -38,12 +38,7 @@ const createEmptyDraftGame = (gameNumber: number, players: string[] = []) => ({
 });
 
 const createInitialDraftState = (trip: Trip): MahjongDraftState => ({
-  games:
-    trip.mahjong?.games.map((game) => ({
-      label: game.label,
-      players: game.results.map((result) => result.name),
-      points: Object.fromEntries(game.results.map((result) => [result.name, `${result.point}`])),
-    })) ?? [createEmptyDraftGame(1, trip.members.slice(0, 4))],
+  games: [createEmptyDraftGame(1)],
 });
 
 const normalizeDraftGame = (game: MahjongDraftGame) => ({
