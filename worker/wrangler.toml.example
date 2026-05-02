@@ -1,0 +1,4 @@
+name = "aote-camp-sync"
+main = "github-sync-worker.mjs"
+compatibility_date = "2026-05-02"
+workers_dev = true

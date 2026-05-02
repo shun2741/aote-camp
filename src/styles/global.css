@@ -977,6 +977,43 @@ a.button {
   font-weight: 700;
 }
 
+.sync-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sync-panel__header h3,
+.sync-panel__header p {
+  margin: 0;
+}
+
+.sync-panel__status {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.sync-panel__status--neutral {
+  color: var(--color-text-sub);
+}
+
+.sync-panel__status--success {
+  color: var(--color-success);
+}
+
+.sync-panel__status--error {
+  color: var(--color-danger);
+}
+
+.sync-panel__hint {
+  margin: 0;
+  color: var(--color-text-sub);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
 .field span,
 .field-label {
   color: var(--color-text-sub);

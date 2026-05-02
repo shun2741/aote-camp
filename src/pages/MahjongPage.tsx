@@ -1,27 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { EmptyState } from "../components/EmptyState";
 import { HeroCard } from "../components/HeroCard";
 import { SectionHeader } from "../components/SectionHeader";
+import { SharedSyncPanel } from "../components/SharedSyncPanel";
 import { StandardCard } from "../components/StandardCard";
 import { getTripById } from "../data/trips";
 import { usePersistentState } from "../hooks/usePersistentState";
 import { formatNumber } from "../lib/format";
 import { calculateMahjongSummary } from "../lib/mahjong";
+import { fetchSharedState, publishSharedState } from "../lib/sharedSync";
+import type { MahjongDraftGame, MahjongDraftState, SharedMahjongData, SharedSyncStatusTone } from "../types/shared";
 import type { MahjongPlayerResult, Trip } from "../types/trip";
 import { NotFoundPage } from "./NotFoundPage";
-
-type MahjongDraftGame = {
-  label: string;
-  players: string[];
-  points: Record<string, string>;
-};
-
-type MahjongDraftState = {
-  games: MahjongDraftGame[];
-};
 
 const defaultRule = {
   rate: 0.5,
@@ -126,6 +119,12 @@ export const MahjongPage = () => {
     `trip-mahjong:${trip.id}`,
     createInitialDraftState(trip),
   );
+  const [sharedUpdatedAt, setSharedUpdatedAt] = useState<string>();
+  const [sharedUpdatedBy, setSharedUpdatedBy] = useState<string>();
+  const [syncMessage, setSyncMessage] = useState<string>();
+  const [syncTone, setSyncTone] = useState<SharedSyncStatusTone>("neutral");
+  const [isRefreshingShared, setIsRefreshingShared] = useState(false);
+  const [isPublishingShared, setIsPublishingShared] = useState(false);
   const migratedDraft = migrateMahjongDraftState(draft as unknown, trip);
 
   useEffect(() => {
@@ -135,6 +134,52 @@ export const MahjongPage = () => {
 
     setDraft(migratedDraft);
   }, [draft, migratedDraft, setDraft]);
+
+  const loadSharedMahjong = async () => {
+    setIsRefreshingShared(true);
+
+    try {
+      const record = await fetchSharedState<SharedMahjongData>(trip.id, "mahjong");
+      const nextDraft = migrateMahjongDraftState(record.data, trip);
+      setDraft(nextDraft);
+      setSharedUpdatedAt(record.updatedAt);
+      setSharedUpdatedBy(record.updatedBy);
+      setSyncTone("success");
+      setSyncMessage("GitHub 上の麻雀データを読み込みました。");
+    } catch (error) {
+      setSyncTone("error");
+      setSyncMessage(error instanceof Error ? error.message : "共有データの取得に失敗しました。");
+    } finally {
+      setIsRefreshingShared(false);
+    }
+  };
+
+  const publishMahjong = async (updatedBy: string, secret: string) => {
+    setIsPublishingShared(true);
+
+    try {
+      const result = await publishSharedState<SharedMahjongData>({
+        tripId: trip.id,
+        kind: "mahjong",
+        data: migratedDraft,
+        updatedBy,
+        secret,
+      });
+      setSharedUpdatedAt(result.updatedAt);
+      setSharedUpdatedBy(updatedBy);
+      setSyncTone("success");
+      setSyncMessage("GitHub へ反映しました。Pages の更新完了後に全員へ見えるようになります。");
+    } catch (error) {
+      setSyncTone("error");
+      setSyncMessage(error instanceof Error ? error.message : "GitHub への反映に失敗しました。");
+    } finally {
+      setIsPublishingShared(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadSharedMahjong();
+  }, [trip.id]);
 
   const addGame = () => {
     setDraft((current) => {
@@ -293,6 +338,20 @@ export const MahjongPage = () => {
             { label: "有効半荘", value: `${completedGames.length}` },
           ]}
         />
+
+        <section className="stack-md">
+          <SharedSyncPanel
+            storageKey={`trip-sync-owner:${trip.id}`}
+            updatedAt={sharedUpdatedAt}
+            updatedBy={sharedUpdatedBy}
+            statusMessage={syncMessage}
+            statusTone={syncTone}
+            isRefreshing={isRefreshingShared}
+            isPublishing={isPublishingShared}
+            onRefresh={() => void loadSharedMahjong()}
+            onPublish={(updatedBy, secret) => void publishMahjong(updatedBy, secret)}
+          />
+        </section>
 
         <section className="stack-md">
           <SectionHeader title="半荘入力" />

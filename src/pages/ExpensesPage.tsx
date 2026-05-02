@@ -1,17 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { EmptyState } from "../components/EmptyState";
 import { HeroCard } from "../components/HeroCard";
 import { SectionHeader } from "../components/SectionHeader";
+import { SharedSyncPanel } from "../components/SharedSyncPanel";
 import { StandardCard } from "../components/StandardCard";
 import { StatusTag } from "../components/StatusTag";
 import { getTripById } from "../data/trips";
 import { usePersistentState } from "../hooks/usePersistentState";
 import { calculateExpenseSummary } from "../lib/expenses";
 import { formatCurrency } from "../lib/format";
+import { fetchSharedState, publishSharedState } from "../lib/sharedSync";
 import { splitAmountEvenly } from "../lib/settlement";
+import type { SharedExpensesData, SharedSyncStatusTone } from "../types/shared";
 import type { Expense, ExpenseCategory } from "../types/trip";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -91,6 +94,12 @@ export const ExpensesPage = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [formState, setFormState] = useState<ExpenseFormState>(() => makeInitialFormState(trip.members));
   const [formError, setFormError] = useState<string | null>(null);
+  const [sharedUpdatedAt, setSharedUpdatedAt] = useState<string>();
+  const [sharedUpdatedBy, setSharedUpdatedBy] = useState<string>();
+  const [syncMessage, setSyncMessage] = useState<string>();
+  const [syncTone, setSyncTone] = useState<SharedSyncStatusTone>("neutral");
+  const [isRefreshingShared, setIsRefreshingShared] = useState(false);
+  const [isPublishingShared, setIsPublishingShared] = useState(false);
   const summary = calculateExpenseSummary(trip.members, draftExpenses);
 
   const resetForm = () => {
@@ -159,6 +168,52 @@ export const ExpensesPage = () => {
     }
   };
 
+  const loadSharedExpenses = async () => {
+    setIsRefreshingShared(true);
+
+    try {
+      const record = await fetchSharedState<SharedExpensesData>(trip.id, "expenses");
+      setDraftExpenses(Array.isArray(record.data) ? record.data : []);
+      setSharedUpdatedAt(record.updatedAt);
+      setSharedUpdatedBy(record.updatedBy);
+      setSyncTone("success");
+      setSyncMessage("GitHub 上の経費データを読み込みました。");
+      resetForm();
+    } catch (error) {
+      setSyncTone("error");
+      setSyncMessage(error instanceof Error ? error.message : "共有データの取得に失敗しました。");
+    } finally {
+      setIsRefreshingShared(false);
+    }
+  };
+
+  const publishExpenses = async (updatedBy: string, secret: string) => {
+    setIsPublishingShared(true);
+
+    try {
+      const result = await publishSharedState<SharedExpensesData>({
+        tripId: trip.id,
+        kind: "expenses",
+        data: draftExpenses,
+        updatedBy,
+        secret,
+      });
+      setSharedUpdatedAt(result.updatedAt);
+      setSharedUpdatedBy(updatedBy);
+      setSyncTone("success");
+      setSyncMessage("GitHub へ反映しました。Pages の更新完了後に全員へ見えるようになります。");
+    } catch (error) {
+      setSyncTone("error");
+      setSyncMessage(error instanceof Error ? error.message : "GitHub への反映に失敗しました。");
+    } finally {
+      setIsPublishingShared(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadSharedExpenses();
+  }, [trip.id]);
+
   return (
     <AppShell
       title="経費"
@@ -178,6 +233,20 @@ export const ExpensesPage = () => {
             { label: "精算数", value: `${summary.payments.length}` },
           ]}
         />
+
+        <section className="stack-md">
+          <SharedSyncPanel
+            storageKey={`trip-sync-owner:${trip.id}`}
+            updatedAt={sharedUpdatedAt}
+            updatedBy={sharedUpdatedBy}
+            statusMessage={syncMessage}
+            statusTone={syncTone}
+            isRefreshing={isRefreshingShared}
+            isPublishing={isPublishingShared}
+            onRefresh={() => void loadSharedExpenses()}
+            onPublish={(updatedBy, secret) => void publishExpenses(updatedBy, secret)}
+          />
+        </section>
 
         <section className="stack-md">
           <SectionHeader title="経費を入力" />
