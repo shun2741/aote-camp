@@ -63,7 +63,7 @@ export const SharedSyncPanel = ({
         <div>
           <h3>共有データ</h3>
           <p>
-            最新を読み込むと GitHub 上の内容で上書きします。反映すると公開サイトにも同じ内容が出ます。
+            最新を読み込むと GitHub 上の内容で上書きします。反映すると Vercel API 経由で GitHub に保存されます。
           </p>
         </div>
         <span className="icon-chip" aria-hidden="true">
@@ -109,7 +109,7 @@ export const SharedSyncPanel = ({
                 type="password"
                 value={secret}
                 onChange={(event) => setSecret(event.target.value)}
-                placeholder="Worker の秘密"
+                placeholder="自分だけが知るパスコード"
               />
             </label>
           </div>
@@ -123,7 +123,7 @@ export const SharedSyncPanel = ({
               {isPublishing ? "反映中..." : "GitHubへ反映"}
             </button>
           </div>
-          <p className="sync-panel__hint">反映すると GitHub に commit され、GitHub Pages の再デプロイ後に全員へ反映されます。</p>
+          <p className="sync-panel__hint">反映すると GitHub に commit されます。全員が `最新を取得` を押せば、すぐ同じ内容を見られます。</p>
         </>
       ) : (
         <p className="sync-panel__hint">書き込み API 未設定です。読み込みだけ利用できます。</p>

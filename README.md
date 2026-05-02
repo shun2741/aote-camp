@@ -7,8 +7,9 @@
 - Vite
 - React
 - TypeScript
-- React Router (`HashRouter`)
-- GitHub Pages
+- React Router (`BrowserRouter`)
+- Vercel
+- Vercel Functions
 
 ## Local Development
 
@@ -16,6 +17,8 @@
 npm install
 npm run dev
 ```
+
+共有 API まで含めてローカル確認するなら `vercel dev` を使ってください。
 
 ## Build
 
@@ -25,49 +28,46 @@ npm run build
 
 ## Deploy
 
-- GitHub Pages 向けに `.github/workflows/deploy.yml` を追加しています。
-- GitHub の `Settings > Pages` で `Build and deployment` を `GitHub Actions` に設定してください。
-- `vite.config.ts` の `base` はリポジトリ名 `aote-camp` 前提です。リポジトリ名を変える場合は `/aote-camp/` を更新してください。
-- 共有反映用の Worker URL を使う場合は、GitHub リポジトリの `Settings > Secrets and variables > Actions > Variables` に `VITE_SYNC_WRITE_URL` を追加してください。
+- Vercel に GitHub リポジトリ連携でデプロイしてください。
+- SPA の直接アクセス用に [vercel.json](/Users/shun/Desktop/codex-app/aote-camp/vercel.json) で rewrite を入れています。
 
 ## Shared Sync
 
 経費と麻雀は `public/shared/2026-gw-tsukuba/*.json` を正本にして共有できます。
 
 - 閲覧
-  - GitHub Pages 上の静的 JSON を全員が読み込みます。
+  - Vercel Function が GitHub 上の JSON を読みます。
 - 反映
-  - owner だけが Cloudflare Worker 経由で GitHub リポジトリの JSON を更新します。
-  - commit 後に GitHub Pages が再デプロイされ、少し待つと全員へ反映されます。
+  - owner だけが Vercel Function 経由で GitHub リポジトリの JSON を更新します。
+  - 更新後、ほかの人は `最新を取得` を押せばすぐ同じ内容を読めます。
 
 ### Files
 
 - 経費: `public/shared/2026-gw-tsukuba/expenses.json`
 - 麻雀: `public/shared/2026-gw-tsukuba/mahjong.json`
+- API: `api/shared.ts`
 
-### Cloudflare Worker Setup
+### Vercel Setup
 
-1. Cloudflare の `Workers & Pages` で新しい Worker を作成
-2. `worker/github-sync-worker.mjs` の内容を貼り付けて deploy
-3. `Settings > Variables and Secrets` で以下を追加
-   - Secret: `GITHUB_TOKEN`
-   - Secret: `WRITE_SECRET`
-   - Text: `GITHUB_OWNER=shun2741`
-   - Text: `GITHUB_REPO=aote-camp`
-   - Text: `GITHUB_BRANCH=main`
-   - Text: `ALLOWED_ORIGINS=https://shun2741.github.io,http://localhost:5173`
-4. GitHub で fine-grained token を作成
+1. Vercel にこの GitHub リポジトリを import
+2. Project Settings > Environment Variables で以下を追加
+   - `GITHUB_TOKEN`
+   - `WRITE_SECRET`
+   - `GITHUB_OWNER=shun2741`
+   - `GITHUB_REPO=aote-camp`
+   - `GITHUB_BRANCH=main`
+3. GitHub で fine-grained token を作成
    - 対象 repo: `shun2741/aote-camp`
    - 権限: `Contents: Read and write`
-5. Worker の URL を控える
-6. GitHub リポジトリの `Settings > Secrets and variables > Actions > Variables` に `VITE_SYNC_WRITE_URL` として Worker URL を入れる
-7. `main` に push すると、その URL を使ったビルドに変わります
+4. 作成した token を Vercel の `GITHUB_TOKEN` に入れる
+5. `WRITE_SECRET` には自分だけが知る長いランダム文字列を入れる
+6. 環境変数を追加したら Vercel で再デプロイ
 
 ### Notes
 
 - `WRITE_SECRET` は長いランダム文字列にしてください。これを知っている人だけが `GitHubへ反映` できます。
 - GitHub の file contents API でファイルを書き換えています。
-- GitHub Pages は静的サイトなので、反映後にデプロイ完了まで少し待ちます。
+- GitHub が正本なので、履歴は commit として残ります。
 
 ## Data Structure
 

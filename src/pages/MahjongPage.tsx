@@ -168,7 +168,7 @@ export const MahjongPage = () => {
       setSharedUpdatedAt(result.updatedAt);
       setSharedUpdatedBy(updatedBy);
       setSyncTone("success");
-      setSyncMessage("GitHub へ反映しました。Pages の更新完了後に全員へ見えるようになります。");
+      setSyncMessage("GitHub へ反映しました。ほかの人は `最新を取得` で読めます。");
     } catch (error) {
       setSyncTone("error");
       setSyncMessage(error instanceof Error ? error.message : "GitHub への反映に失敗しました。");

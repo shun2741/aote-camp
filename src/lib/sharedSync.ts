@@ -18,18 +18,14 @@ type PublishSharedStateError = {
   error?: string;
 };
 
-const sharedWriteUrl = import.meta.env.VITE_SYNC_WRITE_URL?.trim() ?? "";
-
-const buildSharedAssetUrl = (tripId: string, kind: SharedSyncKind) =>
-  `${import.meta.env.BASE_URL}shared/${tripId}/${kind}.json`;
-
-export const hasSharedWriteEndpoint = sharedWriteUrl.length > 0;
+const sharedApiUrl = "/api/shared";
+export const hasSharedWriteEndpoint = true;
 
 export const fetchSharedState = async <T,>(
   tripId: string,
   kind: SharedSyncKind,
 ): Promise<SharedSyncRecord<T>> => {
-  const response = await fetch(buildSharedAssetUrl(tripId, kind), {
+  const response = await fetch(`${sharedApiUrl}?tripId=${encodeURIComponent(tripId)}&kind=${encodeURIComponent(kind)}`, {
     cache: "no-store",
   });
 
@@ -47,11 +43,7 @@ export const publishSharedState = async <T,>({
   updatedBy,
   secret,
 }: PublishSharedStateParams<T>): Promise<PublishSharedStateResult> => {
-  if (!sharedWriteUrl) {
-    throw new Error("書き込み先が未設定です。");
-  }
-
-  const response = await fetch(sharedWriteUrl, {
+  const response = await fetch(sharedApiUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
