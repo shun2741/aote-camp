@@ -1,6 +1,23 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-02T00:00:00.000Z",
-  "updatedBy": "initial",
-  "data": []
+  "updatedAt": "2026-05-02T07:04:13.611Z",
+  "updatedBy": "福田",
+  "data": [
+    {
+      "title": "宿泊代",
+      "amount": 124260,
+      "paidBy": "福田",
+      "participants": [
+        "福田",
+        "信田",
+        "剛",
+        "高橋",
+        "周平",
+        "舟田",
+        "翔悟"
+      ],
+      "category": "hotel",
+      "memo": "宿泊代(麻雀やテニスコート代を除く)"
+    }
+  ]
 }
