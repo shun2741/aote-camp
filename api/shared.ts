@@ -179,7 +179,7 @@ const handlePost = async (request: Request) => {
   }
 };
 
-export default async function handler(request: Request) {
+const handler = async (request: Request) => {
   if (request.method === "GET") {
     return handleGet(request);
   }
@@ -189,4 +189,8 @@ export default async function handler(request: Request) {
   }
 
   return jsonResponse({ error: "Method not allowed." }, { status: 405 });
-}
+};
+
+export const GET = (request: Request) => handler(request);
+
+export const POST = (request: Request) => handler(request);
