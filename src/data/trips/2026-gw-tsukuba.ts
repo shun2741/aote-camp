@@ -97,6 +97,11 @@ export const tsukubaGw2026Trip: Trip = {
     {
       name: "ホテルレイクサイドつくば",
       stayDates: ["2026-05-04"],
+      weatherLocation: {
+        latitude: 36.1,
+        longitude: 140.125,
+        label: "つくば市周辺",
+      },
       checkIn: "15:00",
       checkOut: "10:00",
       address: "〒300-1273 茨城県つくば市下岩崎708-1",

@@ -38,6 +38,11 @@ export type HotelHighlight = {
 export type Hotel = {
   name: string;
   stayDates: string[];
+  weatherLocation?: {
+    latitude: number;
+    longitude: number;
+    label?: string;
+  };
   checkIn?: string;
   checkOut?: string;
   address?: string;

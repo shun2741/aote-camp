@@ -738,6 +738,20 @@ a.button {
   margin: 0;
 }
 
+.weather-card {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.96);
+  border: 1px solid rgba(215, 224, 234, 0.86);
+}
+
+.weather-card h3,
+.weather-card p {
+  margin: 0;
+}
+
 .trip-grid,
 .action-grid {
   grid-template-columns: 1fr;
