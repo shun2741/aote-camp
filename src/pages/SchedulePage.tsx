@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { EmptyState } from "../components/EmptyState";
@@ -66,9 +66,15 @@ export const SchedulePage = () => {
                         ) : null}
                         {event.memo ? <p className="timeline-item__note">{event.memo}</p> : null}
                         {event.url ? (
-                          <a className="text-link" href={event.url} target="_blank" rel="noreferrer">
-                            リンクを開く
-                          </a>
+                          event.url.startsWith("/") ? (
+                            <Link className="text-link" to={event.url}>
+                              詳細を見る
+                            </Link>
+                          ) : (
+                            <a className="text-link" href={event.url} target="_blank" rel="noreferrer">
+                              リンクを開く
+                            </a>
+                          )
                         ) : null}
                       </StandardCard>
                     </div>

@@ -20,6 +20,13 @@ const menuItems = [
     icon: "schedule",
   },
   {
+    key: "golf",
+    label: "ゴルフ",
+    description: "ミニコース情報と初めて向け注意",
+    suffix: "/golf",
+    icon: "golf",
+  },
+  {
     key: "hotel",
     label: "ホテル",
     description: "宿泊先、部屋割り、チェックイン情報",

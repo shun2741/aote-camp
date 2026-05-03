@@ -9,7 +9,7 @@ export const tsukubaGw2026Trip: Trip = {
   status: "planning",
   members: ["福田", "信田", "剛", "高橋", "周平", "舟田", "翔悟"],
   summary:
-    "ゴールデンウィークの1泊2日テニス合宿。テニスを軸に、空き時間のゴルフ練習場と夜の麻雀までホテル内でまとめて回す予定。",
+    "ゴールデンウィークの1泊2日テニス合宿。1日目はテニスと夜の麻雀、2日目はテニスのあとに風呂・昼食を挟んで南筑波ゴルフ場のミニコースまで回る予定。",
   schedule: [
     {
       date: "2026-05-04",
@@ -69,7 +69,7 @@ export const tsukubaGw2026Trip: Trip = {
           time: "09:45",
           title: "チェックアウト",
           location: "フロント",
-          memo: "チェックアウト後にコートへ移動。",
+          memo: "荷物をまとめてからコートへ移動。",
         },
         {
           time: "10:00",
@@ -79,15 +79,45 @@ export const tsukubaGw2026Trip: Trip = {
           important: true,
         },
         {
-          time: "12:15",
-          title: "昼ごはん",
-          location: "周辺のお店へ移動",
-          memo: "下のホテル情報ページに候補を掲載。",
+          time: "12:10",
+          title: "風呂",
+          location: "ホテル館内 温泉",
+          memo: "テニス後にそのまま汗を流す想定。着替え込みで40分前後を見込む。",
         },
         {
-          time: "13:30",
+          time: "13:00",
+          title: "昼ごはん",
+          location: "ホテル周辺のお店",
+          memo: "移動込みで1時間前後を想定。",
+        },
+        {
+          time: "14:10",
+          title: "南筑波ゴルフ場へ移動",
+          location: "車移動",
+          memo: "昼食後に出発。道路状況を見て25〜30分くらいを想定。",
+          transport: "ホテルレイクサイドつくば → 南筑波ゴルフ場",
+          url: "https://www.minamitsukubagolf.com/access.html",
+        },
+        {
+          time: "14:40",
+          title: "到着・受付・準備",
+          location: "南筑波ゴルフ場",
+          memo: "ミニコースは予約不要の到着順。初めての人はクラブ・靴レンタルの確認もここで。",
+          url: "https://www.minamitsukubagolf.com/",
+        },
+        {
+          time: "15:00",
+          title: "ミニコース",
+          location: "南筑波ゴルフ場 ミニコース",
+          memo: "1周約50分（2名目安）。7人なら2組想定で、16:00までに1周+少し練習できれば十分。",
+          important: true,
+          url: "/trips/2026-gw-tsukuba/golf",
+        },
+        {
+          time: "16:15",
           title: "解散",
-          location: "現地または昼食後",
+          location: "南筑波ゴルフ場",
+          memo: "ゴルフ終了後に現地解散。",
           important: true,
         },
       ],
@@ -138,6 +168,10 @@ export const tsukubaGw2026Trip: Trip = {
         {
           label: "天然温泉案内",
           url: "https://www.lakeside-tsukuba.jp/touch/bath/",
+        },
+        {
+          label: "南筑波ゴルフ場",
+          url: "https://www.minamitsukubagolf.com/",
         },
       ],
       highlights: [
