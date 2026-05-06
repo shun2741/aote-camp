@@ -1154,6 +1154,250 @@ a.button {
   padding-bottom: 40px;
 }
 
+.settlement-board {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid rgba(215, 224, 234, 0.96);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 252, 0.96)),
+    linear-gradient(135deg, rgba(31, 75, 122, 0.05), transparent 42%);
+  box-shadow: 0 24px 44px rgba(15, 23, 42, 0.08);
+}
+
+.settlement-board__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.settlement-board__title-block {
+  display: grid;
+  gap: 6px;
+}
+
+.settlement-board__eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-sub);
+}
+
+.settlement-board__title-block h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.05;
+  color: var(--color-primary-dark);
+}
+
+.settlement-board__subline {
+  margin: 0;
+  color: var(--color-text-sub);
+  font-weight: 600;
+}
+
+.settlement-board__actions {
+  display: inline-flex;
+}
+
+.settlement-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.settlement-metric {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(215, 224, 234, 0.94);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.settlement-metric span {
+  color: var(--color-text-sub);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.settlement-metric strong {
+  font-size: 1.12rem;
+  color: var(--color-primary-dark);
+}
+
+.settlement-top-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.settlement-panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(215, 224, 234, 0.94);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.settlement-panel--payments {
+  align-content: start;
+}
+
+.settlement-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settlement-panel__header h2 {
+  margin: 2px 0 0;
+  font-size: 1.05rem;
+  color: var(--color-primary-dark);
+}
+
+.settlement-payment-list {
+  display: grid;
+  gap: 10px;
+}
+
+.settlement-payment-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(31, 75, 122, 0.06), rgba(255, 255, 255, 0.9));
+  border: 1px solid rgba(215, 224, 234, 0.9);
+}
+
+.settlement-payment-card__route {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+.settlement-payment-card__amount {
+  font-size: 1.02rem;
+  color: var(--color-primary-dark);
+  white-space: nowrap;
+}
+
+.settlement-balance-columns {
+  display: grid;
+  gap: 14px;
+}
+
+.settlement-balance-group {
+  display: grid;
+  gap: 10px;
+}
+
+.settlement-balance-group__label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--color-text-sub);
+}
+
+.settlement-balance-list {
+  display: grid;
+  gap: 10px;
+}
+
+.settlement-balance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(246, 249, 252, 0.9);
+  border: 1px solid rgba(215, 224, 234, 0.86);
+}
+
+.settlement-table {
+  display: grid;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(215, 224, 234, 0.94);
+}
+
+.settlement-table__row {
+  display: grid;
+  grid-template-columns: 1.05fr repeat(4, minmax(0, 0.9fr));
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid rgba(215, 224, 234, 0.82);
+}
+
+.settlement-table__head {
+  background: rgba(244, 247, 251, 0.98);
+  border-top: 0;
+}
+
+.settlement-table__head span {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--color-text-sub);
+}
+
+.settlement-table__row strong,
+.settlement-table__row span {
+  min-width: 0;
+}
+
+.settlement-breakdown-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.settlement-breakdown-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(215, 224, 234, 0.94);
+  background: rgba(248, 250, 252, 0.86);
+}
+
+.settlement-breakdown-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settlement-breakdown-card__head h3 {
+  margin: 2px 0 0;
+  font-size: 1rem;
+}
+
+.settlement-breakdown-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.settlement-breakdown-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(215, 224, 234, 0.92);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .print-hide {
   display: inline-flex;
 }
@@ -1359,6 +1603,72 @@ a.button {
   .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .settlement-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .settlement-top-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  }
+
+  .settlement-balance-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settlement-breakdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 719px) {
+  .settlement-board {
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .settlement-board__header {
+    flex-direction: column;
+  }
+
+  .settlement-board__actions,
+  .settlement-board__actions .button {
+    width: 100%;
+  }
+
+  .settlement-payment-card,
+  .settlement-balance-row,
+  .settlement-breakdown-card__head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settlement-payment-card__route {
+    flex-wrap: wrap;
+  }
+
+  .settlement-table {
+    border: 0;
+    gap: 10px;
+    overflow: visible;
+  }
+
+  .settlement-table__head {
+    display: none;
+  }
+
+  .settlement-table__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 14px;
+    padding: 14px;
+    border: 1px solid rgba(215, 224, 234, 0.94);
+    border-radius: 18px;
+  }
+
+  .settlement-table__row strong:first-child {
+    grid-column: 1 / -1;
+    margin-bottom: 2px;
+  }
 }
 
 @media print {
@@ -1381,6 +1691,37 @@ a.button {
 
   .app-shell {
     padding: 0;
+  }
+
+  .settlement-board {
+    padding: 18mm 16mm;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+    background: #fff;
+    min-height: 100vh;
+  }
+
+  .settlement-panel,
+  .settlement-metric,
+  .settlement-breakdown-card,
+  .settlement-payment-card,
+  .settlement-balance-row,
+  .settlement-table__row {
+    background: #fff;
+  }
+
+  .settlement-top-grid,
+  .settlement-breakdown-grid {
+    gap: 12px;
+  }
+
+  .settlement-breakdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settlement-table {
+    border: 1px solid #d1d5db;
   }
 
   .surface-card,
