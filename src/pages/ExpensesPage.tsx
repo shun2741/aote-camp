@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { EmptyState } from "../components/EmptyState";
@@ -11,10 +11,17 @@ import { StatusTag } from "../components/StatusTag";
 import { getTripById } from "../data/trips";
 import { usePersistentState } from "../hooks/usePersistentState";
 import { calculateExpenseSummary } from "../lib/expenses";
+import {
+  buildCompletedMahjongGames,
+  createInitialMahjongDraftState,
+  defaultMahjongRule,
+  migrateMahjongDraftState,
+} from "../lib/mahjongDraft";
 import { formatCurrency } from "../lib/format";
+import { calculateMahjongSummary } from "../lib/mahjong";
 import { fetchSharedState, publishSharedState } from "../lib/sharedSync";
 import { splitAmountEvenly } from "../lib/settlement";
-import type { SharedExpensesData, SharedSyncStatusTone } from "../types/shared";
+import type { MahjongDraftState, SharedExpensesData, SharedMahjongData, SharedSyncStatusTone } from "../types/shared";
 import type { Expense, ExpenseCategory } from "../types/trip";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -91,6 +98,10 @@ export const ExpensesPage = () => {
     `trip-expenses:${trip.id}`,
     trip.expenses,
   );
+  const [mahjongDraft, setMahjongDraft] = usePersistentState<MahjongDraftState>(
+    `trip-mahjong:${trip.id}`,
+    createInitialMahjongDraftState(),
+  );
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [formState, setFormState] = useState<ExpenseFormState>(() => makeInitialFormState(trip.members));
   const [formError, setFormError] = useState<string | null>(null);
@@ -100,7 +111,27 @@ export const ExpensesPage = () => {
   const [syncTone, setSyncTone] = useState<SharedSyncStatusTone>("neutral");
   const [isRefreshingShared, setIsRefreshingShared] = useState(false);
   const [isPublishingShared, setIsPublishingShared] = useState(false);
-  const summary = calculateExpenseSummary(trip.members, draftExpenses);
+
+  const migratedMahjongDraft = useMemo(
+    () => migrateMahjongDraftState(mahjongDraft as unknown, trip),
+    [mahjongDraft, trip],
+  );
+
+  const mahjongSummary = useMemo(() => {
+    const completedGames = buildCompletedMahjongGames(migratedMahjongDraft);
+    return completedGames.length > 0
+      ? calculateMahjongSummary({
+          title: `${trip.title} 麻雀`,
+          rule: defaultMahjongRule,
+          games: completedGames.map(({ label, results }) => ({ label, results })),
+        })
+      : null;
+  }, [migratedMahjongDraft, trip.title]);
+
+  const summary = useMemo(
+    () => calculateExpenseSummary(trip.members, draftExpenses, mahjongSummary?.standings ?? []),
+    [draftExpenses, mahjongSummary?.standings, trip.members],
+  );
 
   const resetForm = () => {
     setEditingIndex(null);
@@ -168,16 +199,25 @@ export const ExpensesPage = () => {
     }
   };
 
-  const loadSharedExpenses = async () => {
+  const loadSharedFinancialData = async () => {
     setIsRefreshingShared(true);
 
     try {
-      const record = await fetchSharedState<SharedExpensesData>(trip.id, "expenses");
-      setDraftExpenses(Array.isArray(record.data) ? record.data : []);
-      setSharedUpdatedAt(record.updatedAt);
-      setSharedUpdatedBy(record.updatedBy);
+      const [expenseRecord, mahjongRecord] = await Promise.all([
+        fetchSharedState<SharedExpensesData>(trip.id, "expenses"),
+        fetchSharedState<SharedMahjongData>(trip.id, "mahjong"),
+      ]);
+
+      setDraftExpenses(Array.isArray(expenseRecord.data) ? expenseRecord.data : []);
+      setMahjongDraft(migrateMahjongDraftState(mahjongRecord.data, trip));
+      setSharedUpdatedAt(
+        expenseRecord.updatedAt > mahjongRecord.updatedAt ? expenseRecord.updatedAt : mahjongRecord.updatedAt,
+      );
+      setSharedUpdatedBy(
+        expenseRecord.updatedAt > mahjongRecord.updatedAt ? expenseRecord.updatedBy : mahjongRecord.updatedBy,
+      );
       setSyncTone("success");
-      setSyncMessage("GitHub 上の経費データを読み込みました。");
+      setSyncMessage("GitHub 上の経費・麻雀データを読み込みました。");
       resetForm();
     } catch (error) {
       setSyncTone("error");
@@ -201,7 +241,7 @@ export const ExpensesPage = () => {
       setSharedUpdatedAt(result.updatedAt);
       setSharedUpdatedBy(updatedBy);
       setSyncTone("success");
-      setSyncMessage("GitHub へ反映しました。ほかの人は `最新を取得` で読めます。");
+      setSyncMessage("GitHub へ反映しました。麻雀分は麻雀ページの反映内容をもとにここへ合算しています。");
     } catch (error) {
       setSyncTone("error");
       setSyncMessage(error instanceof Error ? error.message : "GitHub への反映に失敗しました。");
@@ -211,7 +251,7 @@ export const ExpensesPage = () => {
   };
 
   useEffect(() => {
-    void loadSharedExpenses();
+    void loadSharedFinancialData();
   }, [trip.id]);
 
   return (
@@ -228,8 +268,8 @@ export const ExpensesPage = () => {
           title="経費と割り勘"
           icon="expenses"
           meta={[
-            { label: "総額", value: formatCurrency(summary.totalAmount) },
-            { label: "件数", value: `${draftExpenses.length}` },
+            { label: "実費", value: formatCurrency(summary.expenseTotalAmount) },
+            { label: "麻雀", value: formatCurrency(summary.mahjongTotalAmount) },
             { label: "精算数", value: `${summary.payments.length}` },
           ]}
         />
@@ -243,7 +283,7 @@ export const ExpensesPage = () => {
             statusTone={syncTone}
             isRefreshing={isRefreshingShared}
             isPublishing={isPublishingShared}
-            onRefresh={() => void loadSharedExpenses()}
+            onRefresh={() => void loadSharedFinancialData()}
             onPublish={(updatedBy, secret) => void publishExpenses(updatedBy, secret)}
           />
         </section>
@@ -351,26 +391,78 @@ export const ExpensesPage = () => {
         </section>
 
         <section className="stack-md">
+          <SectionHeader title="精算まとめ" />
+          <StandardCard className="stack-sm">
+            <div className="detail-grid">
+              <div className="metric-card">
+                <span>通常経費</span>
+                <strong>{formatCurrency(summary.expenseTotalAmount)}</strong>
+              </div>
+              <div className="metric-card">
+                <span>麻雀精算</span>
+                <strong>{formatCurrency(summary.mahjongTotalAmount)}</strong>
+              </div>
+              <div className="metric-card">
+                <span>合算表示</span>
+                <strong>{formatCurrency(summary.totalAmount)}</strong>
+              </div>
+            </div>
+            <div className="inline-cluster">
+              <Link className="button button--secondary" to={`/trips/${trip.id}/settlement`}>
+                精算まとめページを開く
+              </Link>
+            </div>
+          </StandardCard>
+        </section>
+
+        <section className="stack-md">
           <SectionHeader title="メンバー別まとめ" />
-          <div className="detail-grid">
+          <div className="stack-md">
             {summary.balances.map((balance) => (
               <StandardCard key={balance.name}>
-                <p className="eyebrow">{balance.name}</p>
-                <div className="stack-xs">
-                  <div className="split-row">
-                    <span>支払済</span>
+                <div className="card-header">
+                  <div>
+                    <p className="eyebrow">{balance.name}</p>
+                    <h3>個人別精算</h3>
+                  </div>
+                  <p
+                    className={`balance-chip ${balance.net >= 0 ? "balance-chip--positive" : "balance-chip--negative"}`}
+                  >
+                    {balance.net >= 0 ? "受け取り" : "支払い"} {formatCurrency(Math.abs(balance.net))}
+                  </p>
+                </div>
+                <div className="detail-grid">
+                  <div className="metric-card">
+                    <span>立替</span>
                     <strong>{formatCurrency(balance.paid)}</strong>
                   </div>
-                  <div className="split-row">
-                    <span>本来負担</span>
+                  <div className="metric-card">
+                    <span>通常負担</span>
                     <strong>{formatCurrency(balance.share)}</strong>
                   </div>
+                  <div className="metric-card">
+                    <span>麻雀</span>
+                    <strong className={balance.mahjong >= 0 ? "score-tone score-tone--positive" : "score-tone score-tone--negative"}>
+                      {balance.mahjong >= 0 ? "+" : ""}
+                      {formatCurrency(balance.mahjong)}
+                    </strong>
+                  </div>
                 </div>
-                <p
-                  className={`balance-chip ${balance.net >= 0 ? "balance-chip--positive" : "balance-chip--negative"}`}
-                >
-                  {balance.net >= 0 ? "受け取り" : "支払い"} {formatCurrency(Math.abs(balance.net))}
-                </p>
+                <div className="breakdown-list">
+                  {balance.breakdown.length === 0 ? (
+                    <p className="muted-text">内訳はまだありません。</p>
+                  ) : (
+                    balance.breakdown.map((item, index) => (
+                      <div className="breakdown-row" key={`${balance.name}-${item.label}-${index}`}>
+                        <span>{item.label}</span>
+                        <strong className={item.amount >= 0 ? "score-tone score-tone--positive" : "score-tone score-tone--negative"}>
+                          {item.amount >= 0 ? "+" : ""}
+                          {formatCurrency(item.amount)}
+                        </strong>
+                      </div>
+                    ))
+                  )}
+                </div>
               </StandardCard>
             ))}
           </div>
@@ -382,7 +474,7 @@ export const ExpensesPage = () => {
             {summary.payments.length === 0 ? (
               <EmptyState
                 title="まだ精算は出ていません"
-                description="経費を追加すると、ここに支払い指示が並びます。"
+                description="経費や麻雀の結果が入ると、ここに支払い指示が並びます。"
               />
             ) : (
               summary.payments.map((payment) => (
@@ -399,7 +491,7 @@ export const ExpensesPage = () => {
         </section>
 
         <section className="stack-md">
-          <SectionHeader title="経費一覧" />
+          <SectionHeader title="通常経費一覧" />
           {draftExpenses.length === 0 ? (
             <EmptyState
               title="経費はまだありません"

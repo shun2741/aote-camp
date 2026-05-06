@@ -9,103 +9,19 @@ import { SharedSyncPanel } from "../components/SharedSyncPanel";
 import { StandardCard } from "../components/StandardCard";
 import { getTripById } from "../data/trips";
 import { usePersistentState } from "../hooks/usePersistentState";
-import { formatNumber } from "../lib/format";
+import {
+  buildCompletedMahjongGames,
+  createEmptyDraftGame,
+  createInitialMahjongDraftState,
+  defaultMahjongRule,
+  migrateMahjongDraftState,
+  normalizeMahjongDraftGame,
+} from "../lib/mahjongDraft";
+import { formatCurrency, formatNumber } from "../lib/format";
 import { calculateMahjongSummary } from "../lib/mahjong";
 import { fetchSharedState, publishSharedState } from "../lib/sharedSync";
-import type { MahjongDraftGame, MahjongDraftState, SharedMahjongData, SharedSyncStatusTone } from "../types/shared";
-import type { MahjongPlayerResult, Trip } from "../types/trip";
+import type { MahjongDraftState, SharedMahjongData, SharedSyncStatusTone } from "../types/shared";
 import { NotFoundPage } from "./NotFoundPage";
-
-const defaultRule = {
-  rate: 0.5,
-  uma: [20, 10, -10, -20] as [number, number, number, number],
-  oka: 20,
-  startPoint: 25000,
-  returnPoint: 30000,
-};
-
-const createEmptyDraftGame = (gameNumber: number, players: string[] = []) => ({
-  label: `${gameNumber}半荘目`,
-  players,
-  points: Object.fromEntries(players.map((player) => [player, `${defaultRule.startPoint}`])),
-});
-
-const createInitialDraftState = (trip: Trip): MahjongDraftState => ({
-  games: [createEmptyDraftGame(1)],
-});
-
-const normalizeDraftGame = (game: MahjongDraftGame) => ({
-  ...game,
-  points: Object.fromEntries(game.players.map((player) => [player, game.points[player] ?? `${defaultRule.startPoint}`])),
-});
-
-const sanitizePlayers = (players: unknown, validMembers: string[]) =>
-  Array.isArray(players)
-    ? players.filter((player): player is string => typeof player === "string" && validMembers.includes(player)).slice(0, 4)
-    : [];
-
-const sanitizeLegacyResults = (results: unknown, validMembers: string[]) =>
-  Array.isArray(results)
-    ? results.filter(
-        (result): result is MahjongPlayerResult =>
-          typeof result === "object" &&
-          result !== null &&
-          typeof (result as MahjongPlayerResult).name === "string" &&
-          typeof (result as MahjongPlayerResult).point === "number" &&
-          validMembers.includes((result as MahjongPlayerResult).name),
-      )
-    : [];
-
-const migrateMahjongDraftState = (value: unknown, trip: Trip): MahjongDraftState => {
-  const fallback = createInitialDraftState(trip);
-
-  if (!value || typeof value !== "object" || !("games" in value) || !Array.isArray((value as { games?: unknown[] }).games)) {
-    return fallback;
-  }
-
-  const rawGames = (value as { games: unknown[] }).games;
-  const migratedGames = rawGames
-    .map((rawGame, index) => {
-      if (!rawGame || typeof rawGame !== "object") {
-        return null;
-      }
-
-      const record = rawGame as {
-        label?: unknown;
-        players?: unknown;
-        points?: unknown;
-        results?: unknown;
-      };
-
-      const label = typeof record.label === "string" && record.label.trim() ? record.label : `${index + 1}半荘目`;
-      const legacyResults = sanitizeLegacyResults(record.results, trip.members);
-      const players =
-        sanitizePlayers(record.players, trip.members).length > 0
-          ? sanitizePlayers(record.players, trip.members)
-          : legacyResults.map((result) => result.name).slice(0, 4);
-
-      const points =
-        legacyResults.length > 0
-          ? Object.fromEntries(legacyResults.map((result) => [result.name, `${result.point}`]))
-          : typeof record.points === "object" && record.points !== null
-            ? Object.fromEntries(
-                players.map((player) => {
-                  const rawPoint = (record.points as Record<string, unknown>)[player];
-                  return [player, typeof rawPoint === "string" ? rawPoint : `${defaultRule.startPoint}`];
-                }),
-              )
-            : Object.fromEntries(players.map((player) => [player, `${defaultRule.startPoint}`]));
-
-      return normalizeDraftGame({
-        label,
-        players,
-        points,
-      });
-    })
-    .filter((game): game is MahjongDraftGame => game !== null);
-
-  return migratedGames.length > 0 ? { games: migratedGames } : fallback;
-};
 
 export const MahjongPage = () => {
   const { tripId = "" } = useParams();
@@ -117,7 +33,7 @@ export const MahjongPage = () => {
 
   const [draft, setDraft, resetDraft] = usePersistentState<MahjongDraftState>(
     `trip-mahjong:${trip.id}`,
-    createInitialDraftState(trip),
+    createInitialMahjongDraftState(),
   );
   const [sharedUpdatedAt, setSharedUpdatedAt] = useState<string>();
   const [sharedUpdatedBy, setSharedUpdatedBy] = useState<string>();
@@ -236,7 +152,7 @@ export const MahjongPage = () => {
             players: [...game.players, member],
             points: {
               ...game.points,
-              [member]: game.points[member] ?? `${defaultRule.startPoint}`,
+              [member]: game.points[member] ?? `${defaultMahjongRule.startPoint}`,
             },
           };
         }),
@@ -263,23 +179,13 @@ export const MahjongPage = () => {
     });
   };
 
-  const completedGames = migratedDraft.games
-    .map((game, gameIndex) => ({ game: normalizeDraftGame(game), gameIndex }))
-    .filter(({ game }) => game.players.length === 4)
-    .map(({ game, gameIndex }) => ({
-      label: game.label,
-      gameIndex,
-      results: game.players.map((player) => ({
-        name: player,
-        point: Number(game.points[player]) || 0,
-      })),
-    }));
+  const completedGames = buildCompletedMahjongGames(migratedDraft);
 
   const summary =
     completedGames.length > 0
       ? calculateMahjongSummary({
           title: `${trip.title} 麻雀`,
-          rule: defaultRule,
+          rule: defaultMahjongRule,
           games: completedGames.map(({ label, results }) => ({ label, results })),
         })
       : null;
@@ -290,6 +196,7 @@ export const MahjongPage = () => {
       return {
         name: member,
         score: standing?.score ?? 0,
+        amount: standing?.amount ?? 0,
       };
     })
     .sort((left, right) => right.score - left.score);
@@ -300,6 +207,7 @@ export const MahjongPage = () => {
     return {
       label: game.label,
       scores: Object.fromEntries(rows.map((row) => [row.name, row.totalScore])),
+      amounts: Object.fromEntries(rows.map((row) => [row.name, row.totalAmount])),
     };
   });
 
@@ -333,7 +241,7 @@ export const MahjongPage = () => {
           title="麻雀精算"
           icon="mahjong"
           meta={[
-            { label: "ルール", value: "1・2の点5" },
+            { label: "ルール", value: "1,000点 = 500円" },
             { label: "半荘数", value: `${migratedDraft.games.length}` },
             { label: "有効半荘", value: `${completedGames.length}` },
           ]}
@@ -366,7 +274,7 @@ export const MahjongPage = () => {
             </div>
 
             {migratedDraft.games.map((game, gameIndex) => {
-              const normalized = normalizeDraftGame(game);
+              const normalized = normalizeMahjongDraftGame(game);
               const totalPoint = normalized.players.reduce(
                 (sum, player) => sum + (Number(normalized.points[player]) || 0),
                 0,
@@ -457,10 +365,27 @@ export const MahjongPage = () => {
                       {member.score >= 0 ? "+" : ""}
                       {formatNumber(member.score)}
                     </p>
-                    <p className="muted-text">合計スコア</p>
+                    <p className={`muted-text ${getScoreToneClass(member.amount)}`}>
+                      {member.amount >= 0 ? "+" : ""}
+                      {formatCurrency(member.amount)}
+                    </p>
                   </StandardCard>
                 ))}
               </div>
+            </section>
+
+            <section className="stack-md">
+              <SectionHeader title="点5の金額" />
+              <StandardCard className="stack-sm">
+                <div className="split-row">
+                  <span>レート</span>
+                  <strong>1,000点 = 500円</strong>
+                </div>
+                <div className="split-row">
+                  <span>受け取り総額</span>
+                  <strong>{formatCurrency(summary.totalSettlementAmount)}</strong>
+                </div>
+              </StandardCard>
             </section>
 
             <section className="stack-md">
@@ -483,15 +408,33 @@ export const MahjongPage = () => {
                           <th>{member.name}</th>
                           {perGameScores.map((game) => {
                             const score = game.scores[member.name];
+                            const amount = game.amounts[member.name];
                             return (
                               <td className={getScoreToneClass(score)} key={`${member.name}-${game.label}`}>
-                                {score === undefined ? "-" : `${score >= 0 ? "+" : ""}${formatNumber(score)}`}
+                                {score === undefined ? (
+                                  "-"
+                                ) : (
+                                  <div className="table-stack">
+                                    <span>{`${score >= 0 ? "+" : ""}${formatNumber(score)}`}</span>
+                                    <span className="muted-text">
+                                      {`${amount >= 0 ? "+" : ""}${formatCurrency(amount)}`}
+                                    </span>
+                                  </div>
+                                )}
                               </td>
                             );
                           })}
                           <td className={`result-table__total ${getScoreToneClass(member.score)}`}>
-                            {member.score >= 0 ? "+" : ""}
-                            {formatNumber(member.score)}
+                            <div className="table-stack">
+                              <span>
+                                {member.score >= 0 ? "+" : ""}
+                                {formatNumber(member.score)}
+                              </span>
+                              <span className="muted-text">
+                                {member.amount >= 0 ? "+" : ""}
+                                {formatCurrency(member.amount)}
+                              </span>
+                            </div>
                           </td>
                         </tr>
                       ))}

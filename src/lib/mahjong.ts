@@ -12,6 +12,7 @@ export type MahjongGameRow = {
   umaScore: number;
   okaScore: number;
   totalScore: number;
+  totalAmount: number;
 };
 
 export type MahjongGameSummary = {
@@ -22,13 +23,16 @@ export type MahjongGameSummary = {
 export type MahjongStanding = {
   name: string;
   score: number;
+  amount: number;
 };
 
 export type MahjongSummary = {
   title: string;
   gameCount: number;
+  rate: number;
   standings: MahjongStanding[];
   games: MahjongGameSummary[];
+  totalSettlementAmount: number;
 };
 
 const resolveRanks = (results: MahjongPlayerResult[]): MahjongPlayerResult[] => {
@@ -62,6 +66,7 @@ const summarizeGame = (game: MahjongGame, data: MahjongData): MahjongGameSummary
       const umaScore = data.rule.uma[rank - 1];
       const okaScore = rank === 1 ? data.rule.oka : 0;
       const totalScore = rawScore + umaScore + okaScore;
+      const totalAmount = Math.round(totalScore * data.rule.rate * 1000);
 
       return {
         name: result.name,
@@ -71,6 +76,7 @@ const summarizeGame = (game: MahjongGame, data: MahjongData): MahjongGameSummary
         umaScore,
         okaScore,
         totalScore,
+        totalAmount,
       };
     })
     .sort((left, right) => left.rank - right.rank);
@@ -90,19 +96,26 @@ export const calculateMahjongSummary = (data: MahjongData): MahjongSummary => {
       const current = totals.get(row.name) ?? {
         name: row.name,
         score: 0,
+        amount: 0,
       };
 
       current.score += row.totalScore;
+      current.amount += row.totalAmount;
       totals.set(row.name, current);
     });
   });
 
   const standings = [...totals.values()].sort((left, right) => right.score - left.score);
+  const totalSettlementAmount = standings
+    .filter((standing) => standing.amount > 0)
+    .reduce((sum, standing) => sum + standing.amount, 0);
 
   return {
     title: data.title,
     gameCount: games.length,
+    rate: data.rule.rate,
     standings,
     games,
+    totalSettlementAmount,
   };
 };

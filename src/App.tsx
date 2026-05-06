@@ -6,6 +6,7 @@ import { HotelPage } from "./pages/HotelPage";
 import { MahjongPage } from "./pages/MahjongPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { SchedulePage } from "./pages/SchedulePage";
+import { SettlementPage } from "./pages/SettlementPage";
 import { TripOverviewPage } from "./pages/TripOverviewPage";
 
 const App = () => (
@@ -16,6 +17,7 @@ const App = () => (
     <Route path="/trips/:tripId/golf" element={<GolfPage />} />
     <Route path="/trips/:tripId/hotel" element={<HotelPage />} />
     <Route path="/trips/:tripId/expenses" element={<ExpensesPage />} />
+    <Route path="/trips/:tripId/settlement" element={<SettlementPage />} />
     <Route path="/trips/:tripId/mahjong" element={<MahjongPage />} />
     <Route path="/home" element={<Navigate replace to="/" />} />
     <Route path="*" element={<NotFoundPage />} />
