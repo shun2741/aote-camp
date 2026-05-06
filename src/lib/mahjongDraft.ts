@@ -2,7 +2,7 @@ import type { MahjongDraftGame, MahjongDraftState } from "../types/shared";
 import type { MahjongPlayerResult, Trip } from "../types/trip";
 
 export const defaultMahjongRule = {
-  rate: 0.5,
+  rate: 0.05,
   uma: [20, 10, -10, -20] as [number, number, number, number],
   oka: 20,
   startPoint: 25000,

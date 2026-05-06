@@ -241,7 +241,7 @@ export const MahjongPage = () => {
           title="麻雀精算"
           icon="mahjong"
           meta={[
-            { label: "ルール", value: "1,000点 = 500円" },
+            { label: "ルール", value: "1,000点 = 50円" },
             { label: "半荘数", value: `${migratedDraft.games.length}` },
             { label: "有効半荘", value: `${completedGames.length}` },
           ]}
@@ -379,7 +379,7 @@ export const MahjongPage = () => {
               <StandardCard className="stack-sm">
                 <div className="split-row">
                   <span>レート</span>
-                  <strong>1,000点 = 500円</strong>
+                  <strong>1,000点 = 50円</strong>
                 </div>
                 <div className="split-row">
                   <span>受け取り総額</span>
