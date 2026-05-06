@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-02T07:04:13.611Z",
+  "updatedAt": "2026-05-06T02:36:01.869Z",
   "updatedBy": "福田",
   "data": [
     {
-      "title": "宿泊代",
-      "amount": 124260,
+      "title": "宿代",
+      "amount": 142470,
       "paidBy": "福田",
       "participants": [
         "福田",
@@ -17,7 +17,50 @@
         "翔悟"
       ],
       "category": "hotel",
-      "memo": "宿泊代(麻雀やテニスコート代を除く)"
+      "memo": "宿代(宿泊費、テニスコート、麻雀、入湯税含む)"
+    },
+    {
+      "title": "テニスボール",
+      "amount": 3267,
+      "paidBy": "高橋",
+      "participants": [
+        "福田",
+        "信田",
+        "剛",
+        "高橋",
+        "周平",
+        "舟田",
+        "翔悟"
+      ],
+      "category": "activity",
+      "memo": "テニスボール購入代"
+    },
+    {
+      "title": "買い出し代",
+      "amount": 9095,
+      "paidBy": "高橋",
+      "participants": [
+        "福田",
+        "信田",
+        "剛",
+        "高橋",
+        "周平",
+        "舟田",
+        "翔悟"
+      ],
+      "category": "food",
+      "memo": "お菓子、酒などの買い出し代金"
+    },
+    {
+      "title": "剛、しょうご昼食代",
+      "amount": 1800,
+      "paidBy": "翔悟",
+      "participants": [
+        "剛",
+        "翔悟"
+      ],
+      "category": "food",
+      "memo": "しょうごが剛の昼食代立て替え"
     }
   ]
 }
