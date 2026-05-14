@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-06T02:36:01.869Z",
+  "updatedAt": "2026-05-14T11:33:43.736Z",
   "updatedBy": "福田",
   "data": [
     {
@@ -61,6 +61,18 @@
       ],
       "category": "food",
       "memo": "しょうごが剛の昼食代立て替え"
+    },
+    {
+      "title": "川崎からの交通費",
+      "amount": 7483,
+      "paidBy": "舟田",
+      "participants": [
+        "周平",
+        "舟田",
+        "福田"
+      ],
+      "category": "transport",
+      "memo": "川崎からの高速、ガソリン代"
     }
   ]
 }
